@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TACC Wallet Transactions</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f8f8; padding: 20px; }
+    h2 { color: #2e86de; }
+    .tx-box { background: white; padding: 15px; margin-bottom: 10px; border-radius: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .tx-box span { display: block; margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <h2>🧾 TACC Wallet Transaction History</h2>
+  <div id="tx-container">Loading transactions...</div>
+
+  <script>
+    const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+    const apiKey = "RW5QUV4FC7DGCDTG4B882H751ISXJJ8M14";
+
+    async function getTransactions() {
+      const url = `https://api.bscscan.com/api?module=account&action=tokentx&address=${walletAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      const txContainer = document.getElementById("tx-container");
+      txContainer.innerHTML = "";
+
+      if (data.status !== "1") {
+        txContainer.innerHTML = "<p>No transactions found or an error occurred.</p>";
+        return;
+      }
+
+      const txs = data.result.filter(tx => tx.tokenSymbol === "TACC");
+
+      txs.slice(0, 10).forEach(tx => {
+        const box = document.createElement("div");
+        box.className = "tx-box";
+        box.innerHTML = `
+          <span><strong>From:</strong> ${tx.from}</span>
+          <span><strong>To:</strong> ${tx.to}</span>
+          <span><strong>Amount:</strong> ${Number(tx.value) / (10 ** tx.tokenDecimal)} ${tx.tokenSymbol}</span>
+          <span><strong>Time:</strong> ${new Date(tx.timeStamp * 1000).toLocaleString()}</span>
+          <span><strong>Txn Hash:</strong> <a href="https://bscscan.com/tx/${tx.hash}" target="_blank">${tx.hash.slice(0, 30)}...</a></span>
+        `;
+        txContainer.appendChild(box);
+      });
+    }
+
+    getTransactions();
+  </script>
+</body>
+</html>
