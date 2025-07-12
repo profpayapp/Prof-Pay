@@ -1,21 +1,62 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-  <title>Prof-Pay</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prof-Pay Service Dashboard</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      padding: 30px;
       text-align: center;
-      background: #f1f1f1;
-      padding: 50px;
     }
     h1 {
       color: #2e86de;
     }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .service {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: 0.3s;
+    }
+    .service:hover {
+      transform: translateY(-5px);
+    }
+    .service a {
+      text-decoration: none;
+      color: #2e86de;
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>Welcome to Prof-Pay</h1>
-  <p>🚀 Site setup in progress. Utility module coming soon.</p>
+  <h1>Prof-Pay Utility Dashboard</h1>
+  <p>Choose a service below to proceed</p>  <div class="grid">
+    <div class="service">
+      <img src="https://img.icons8.com/ios-filled/100/2e86de/phone.png" alt="Airtime" width="60" />
+      <a href="airtime.html">Buy Airtime</a>
+    </div>
+    <div class="service">
+      <img src="https://img.icons8.com/ios-filled/100/2e86de/signal.png" alt="Data" width="60" />
+      <a href="data.html">Buy Data</a>
+    </div>
+    <div class="service">
+      <img src="https://img.icons8.com/ios-filled/100/2e86de/electrical.png" alt="Electricity" width="60" />
+      <a href="electricity.html">Electricity Bill</a>
+    </div>
+    <div class="service">
+      <img src="https://img.icons8.com/ios-filled/100/2e86de/tv.png" alt="Cable TV" width="60" />
+      <a href="cabletv.html">Cable TV</a>
+    </div>
+  </div>
 </body>
 </html>
