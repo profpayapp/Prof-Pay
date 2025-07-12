@@ -1,75 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Prof-Pay Utility</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
       padding: 20px;
-      background-color: #f1f1f1;
     }
     h2 {
-      color: #2e86de;
+      color: #2c3e50;
     }
     .section {
-      background: white;
+      background: #fff;
       padding: 20px;
-      margin: 15px 0;
+      margin-bottom: 15px;
       border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     button {
-      background-color: #2e86de;
+      background-color: #27ae60;
       color: white;
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
       margin-top: 10px;
+      cursor: pointer;
     }
     button:hover {
-      background-color: #1b4f72;
+      background-color: #219150;
     }
-    .wallet {
-      background: #eaf2f8;
-      padding: 15px;
+    .wallet-box {
+      background: #ecf0f1;
+      padding: 10px;
       border-radius: 8px;
-      margin-top: 10px;
+      font-family: monospace;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
-
-  <h2>Prof-Pay Utility Payment Page</h2>
+  <h2>Prof-Pay Utility Services</h2>
 
   <div class="section">
     <h3>1. Airtime Recharge</h3>
     <p>Recharge your phone instantly using Crypto or Fiat.</p>
-    <button onclick="alert('Processing Airtime Payment...')">Proceed to Pay</button>
+    <button onclick="alert('Airtime payment processing...')">Proceed to Pay</button>
   </div>
 
   <div class="section">
     <h3>2. Data Bundle</h3>
     <p>Buy affordable data plans for any network.</p>
-    <button onclick="alert('Processing Data Payment...')">Proceed to Pay</button>
+    <button onclick="alert('Data bundle payment processing...')">Proceed to Pay</button>
   </div>
 
   <div class="section">
     <h3>3. Electricity Bill</h3>
-    <p>Pay electricity bills across Nigeria (PHCN, Ikeja, AEDC...)</p>
-    <button onclick="alert('Processing Electricity Payment...')">Proceed to Pay</button>
+    <p>Pay electricity bills across Nigeria (PHCN, AEDC, IKEDC...)</p>
+    <button onclick="alert('Electricity bill payment processing...')">Proceed to Pay</button>
   </div>
 
   <div class="section">
     <h3>4. Cable TV Subscription</h3>
-    <p>Renew your GOtv, DStv or Startimes subscription with ease.</p>
-    <button onclick="alert('Processing TV Payment...')">Proceed to Pay</button>
+    <p>Renew your GOtv, DStv, or Startimes subscription with ease.</p>
+    <button onclick="alert('TV subscription payment processing...')">Proceed to Pay</button>
   </div>
 
-  <div class="wallet">
-    <h4>Crypto Wallet (TACC)</h4>
-    <p>Send payment to this address:</p>
-    <code>0xb021a0e505ecfe41dcb497b70fb123430e30d94d</code>
+  <div class="section">
+    <h3>💳 TACC Wallet Address</h3>
+    <p>Send payment to the wallet below:</p>
+    <div class="wallet-box">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</div>
+    <p><small>On Binance Smart Chain (BEP20)</small></p>
   </div>
 
 </body>
