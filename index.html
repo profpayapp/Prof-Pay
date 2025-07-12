@@ -1,62 +1,85 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prof-Pay Service Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prof-Pay Dashboard</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f9f9f9;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f6fc;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #2e86de;
+      color: white;
+      padding: 20px;
       text-align: center;
     }
-    h1 {
-      color: #2e86de;
-    }
-    .grid {
+    .container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
-      margin-top: 30px;
+      padding: 40px 20px;
     }
-    .service {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      transition: 0.3s;
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: 0.3s ease;
     }
-    .service:hover {
+    .card:hover {
       transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
-    .service a {
+    .card a {
       text-decoration: none;
       color: #2e86de;
+      font-size: 18px;
       font-weight: bold;
       display: block;
       margin-top: 10px;
     }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #d6eaff;
+      font-size: 14px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
-  <h1>Prof-Pay Utility Dashboard</h1>
-  <p>Choose a service below to proceed</p>  <div class="grid">
-    <div class="service">
-      <img src="https://img.icons8.com/ios-filled/100/2e86de/phone.png" alt="Airtime" width="60" />
-      <a href="airtime.html">Buy Airtime</a>
+  <header>
+    <h1>📱 Prof-Pay Service Dashboard</h1>
+    <p>Seamless Utility & Crypto Payment Access</p>
+  </header>
+  <main class="container">
+    <div class="card">
+      <h2>Airtime Recharge</h2>
+      <a href="airtime.html">Launch</a>
     </div>
-    <div class="service">
-      <img src="https://img.icons8.com/ios-filled/100/2e86de/signal.png" alt="Data" width="60" />
-      <a href="data.html">Buy Data</a>
+    <div class="card">
+      <h2>Data Bundle</h2>
+      <a href="data.html">Launch</a>
     </div>
-    <div class="service">
-      <img src="https://img.icons8.com/ios-filled/100/2e86de/electrical.png" alt="Electricity" width="60" />
-      <a href="electricity.html">Electricity Bill</a>
+    <div class="card">
+      <h2>Electricity Bill</h2>
+      <a href="electricity.html">Launch</a>
     </div>
-    <div class="service">
-      <img src="https://img.icons8.com/ios-filled/100/2e86de/tv.png" alt="Cable TV" width="60" />
-      <a href="cabletv.html">Cable TV</a>
+    <div class="card">
+      <h2>TV Subscription</h2>
+      <a href="tv.html">Launch</a>
     </div>
-  </div>
+    <div class="card">
+      <h2>Wallet Tracker</h2>
+      <a href="wallet.html">View</a>
+    </div>
+  </main>
+  <footer>
+    &copy; 2025 Prof-Pay. Powered by Crypto Prof | Built on BSC & TACC
+  </footer>
 </body>
 </html>
