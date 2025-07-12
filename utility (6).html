@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prof-Pay Utility Services</title>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+    .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    h2 { color: #2c3e50; }
+    input, select, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button { background-color: #3498db; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #2980b9; }
+  </style>
+</head>
+<body>
+
+  <h1>Prof-Pay Utility Services</h1>
+
+  <div class="section">
+    <h2>Airtime Recharge</h2>
+    <input type="text" id="airtime-phone" placeholder="Enter Phone Number">
+    <select id="airtime-network">
+      <option value="mtn">MTN</option>
+      <option value="glo">GLO</option>
+      <option value="airtel">AIRTEL</option>
+      <option value="9mobile">9MOBILE</option>
+    </select>
+    <input type="number" id="airtime-amount" placeholder="Amount (₦)">
+    <button onclick="payAirtime()">Proceed to Pay</button>
+  </div>
+
+  <div class="section">
+    <h2>Data Bundle</h2>
+    <input type="text" id="data-phone" placeholder="Enter Phone Number">
+    <select id="data-network">
+      <option value="mtn">MTN</option>
+      <option value="glo">GLO</option>
+      <option value="airtel">AIRTEL</option>
+      <option value="9mobile">9MOBILE</option>
+    </select>
+    <input type="number" id="data-amount" placeholder="Amount (₦)">
+    <button onclick="payData()">Proceed to Pay</button>
+  </div>
+
+  <div class="section">
+    <h2>Electricity Bill</h2>
+    <input type="text" id="meter-number" placeholder="Enter Meter Number">
+    <select id="disco">
+      <option value="ikeja-electric">Ikeja Electric</option>
+      <option value="eko-electric">Eko Electric</option>
+      <option value="abuja-electric">Abuja Electric (AEDC)</option>
+    </select>
+    <input type="number" id="electricity-amount" placeholder="Amount (₦)">
+    <button onclick="payElectricity()">Proceed to Pay</button>
+  </div>
+
+  <div class="section">
+    <h2>Cable TV Subscription</h2>
+    <input type="text" id="smart-card" placeholder="Smart Card Number">
+    <select id="cable-provider">
+      <option value="gotv">GOtv</option>
+      <option value="dstv">DStv</option>
+      <option value="startimes">Startimes</option>
+    </select>
+    <input type="number" id="tv-amount" placeholder="Amount (₦)">
+    <button onclick="payTV()">Proceed to Pay</button>
+  </div>
+
+<script>
+  const baseUrl = "https://sandbox.vtpass.com/api";
+  const headers = {
+    "Content-Type": "application/json",
+    "api-key": "sandbox@vtpass.com:sandbox"  // Not real header format, placeholder for test
+  };
+
+  function payAirtime() {
+    alert("Processing Airtime... (demo only, backend logic not connected)");
+  }
+
+  function payData() {
+    alert("Processing Data Bundle... (demo only, backend logic not connected)");
+  }
+
+  function payElectricity() {
+    alert("Processing Electricity Bill... (demo only, backend logic not connected)");
+  }
+
+  function payTV() {
+    alert("Processing Cable TV... (demo only, backend logic not connected)");
+  }
+</script>
+
+</body>
+</html>
