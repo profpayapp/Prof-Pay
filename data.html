@@ -1,103 +1,126 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prof-Pay | Buy Data</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            color: #333;
-            padding: 20px;
-        }
-        h1 {
-            color: #4CAF50;
-        }
-        .section {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .section h2 {
-            color: #333;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input, select {
-            padding: 10px;
-            width: 100%;
-            margin-top: 5px;
-            margin-bottom: 15px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .wallet-section {
-            background: #fff3cd;
-            border-left: 6px solid #ffc107;
-            padding: 15px;
-            margin-top: 30px;
-            border-radius: 8px;
-        }
-        .wallet-section h3 {
-            margin: 0;
-        }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 14px;
-            color: #999;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prof-Pay | Buy Data</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4b0082;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.7rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #4b0082;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .success, .error {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .success { background: #c8e6c9; color: #2e7d32; }
+    .error { background: #ffcdd2; color: #c62828; }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .wallet-section {
+      margin-top: 2rem;
+      background: #f8f8f8;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 5px solid #4b0082;
+    }
+  </style>
 </head>
 <body>
-    <h1>Prof-Pay | Buy Data</h1>
+  <header>
+    <h1>Prof-Pay: Buy Data</h1>
+  </header>
 
-    <div class="section">
-        <h2>Buy Data Bundle</h2>
-        <label for="phone">Phone Number:</label>
-        <input type="tel" id="phone" placeholder="Enter phone number">
+  <main>
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" placeholder="Enter phone number" />
 
-        <label for="network">Select Network:</label>
-        <select id="network">
-            <option value="mtn">MTN</option>
-            <option value="glo">GLO</option>
-            <option value="airtel">Airtel</option>
-            <option value="9mobile">9Mobile</option>
-        </select>
+    <label for="network">Select Network:</label>
+    <select id="network">
+      <option value="mtn">MTN</option>
+      <option value="glo">GLO</option>
+      <option value="airtel">AIRTEL</option>
+      <option value="9mobile">9MOBILE</option>
+    </select>
 
-        <label for="amount">Amount (₦):</label>
-        <input type="number" id="amount" placeholder="Enter amount">
+    <label for="amount">Amount (₦):</label>
+    <input type="number" id="amount" placeholder="Enter amount" />
 
-        <button onclick="alert('✅ Data simulated for payment')">Proceed to Pay</button>
-    </div>
+    <button onclick="processData()">Proceed to Pay</button>
 
+    <div id="message"></div>
+
+    <!-- ✅ MULTI-CRYPTO WALLET SECTION -->
     <div class="wallet-section">
-        <h3>💳 Crypto Wallet (TACC / BNB / USDT)</h3>
-        <p><strong>Send payment to:</strong></p>
-        <p><code>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code></p>
-        <p><strong>Network:</strong> Binance Smart Chain (BEP20)</p>
-    </div>
+      <h3>Send Payment To:</h3>
+      <p><strong>TACC / BNB / USDT (BEP20):</strong><br>
+      <code>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code></p>
 
-    <div class="wallet-section">
-        <h3>🌐 Pi Network Wallet</h3>
-        <p><strong>Send Pi to:</strong></p>
-        <p><code>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</code></p>
+      <p><strong>Pi Network Wallet:</strong><br>
+      <code>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</code></p>
     </div>
+  </main>
 
-    <footer>
-        &copy; 2025 Prof-Pay | All Rights Reserved
-    </footer>
+  <footer>
+    &copy; 2025 Prof-Pay | Built on BSC & Pi Network
+  </footer>
+
+  <script>
+    function processData() {
+      const phone = document.getElementById('phone').value;
+      const network = document.getElementById('network').value;
+      const amount = document.getElementById('amount').value;
+      const messageBox = document.getElementById('message');
+
+      if (!phone || !amount) {
+        messageBox.innerHTML = `<div class="error">❌ Please fill all fields.</div>`;
+        return;
+      }
+
+      // ✅ Simulate Payment Message
+      messageBox.innerHTML = `<div class="success">✅ Data purchase simulated for ${phone} on ${network.toUpperCase()} - ₦${amount}</div>`;
+    }
+  </script>
 </body>
 </html>
