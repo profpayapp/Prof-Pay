@@ -109,7 +109,29 @@
   <p style="margin-top:10px;">On Binance Smart Chain (BEP20)</p>
   <p style="color:#2e86de; font-weight:bold;">📡 Tracking Status: Connected</p>
 </div>
-<!-- End of TACC Wallet Tracker -->
+<!-- End of TACC Wallet Tracker --> <!-- 🪙 Crypto Payment Section (TACC) -->
+<div style="background:#f1f1f1;padding:20px;margin-top:30px;border-radius:10px;">
+  <h3>💳 Pay with TACC (Crypto)</h3>
+  <p>Please send payment to the wallet address below:</p>
+
+  <div style="background:#fff;padding:15px;border:1px solid #ccc;border-radius:8px;word-break:break-all;">
+    <strong>Wallet Address:</strong><br>
+    <code id="walletAddress">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code>
+    <br><br>
+    <button onclick="copyAddress()" style="background:#2e86de;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;">📋 Copy Address</button>
+  </div>
+
+  <p style="margin-top:15px;">After making the payment, click the button below to verify or notify us:</p>
+  <button onclick="alert('✅ Payment verification coming soon. Thank you!')" style="background:#28a745;color:#fff;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;">✅ I Have Paid</button>
+</div>
+
+<script>
+  function copyAddress() {
+    const copyText = document.getElementById("walletAddress").textContent;
+    navigator.clipboard.writeText(copyText);
+    alert("✅ Wallet address copied to clipboard!");
+  }
+</script>
   </script>
 </body>
 </html>
