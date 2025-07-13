@@ -3,94 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prof-Pay | Electricity Bill</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <title>Prof-Pay | Electricity Payment</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
-      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #f0f2f5, #e2e8f0);
+      padding: 20px;
+      color: #333;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 2rem;
+    h1 {
+      text-align: center;
+      color: #007bff;
+    }
+    form {
+      max-width: 500px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    .wallet-box {
-      background: #f1f1f1;
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
+    label {
+      display: block;
+      margin-top: 10px;
     }
-    .btn-primary, .btn-outline-secondary {
+    input, select {
       width: 100%;
-      margin-top: 1rem;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+    .crypto-box {
+      background: #f8fafc;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
     }
     footer {
-      margin-top: 2rem;
       text-align: center;
-      font-size: 0.85rem;
+      margin-top: 40px;
       color: #666;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2 class="text-center mb-4">Electricity Bill Payment</h2>
 
-    <form>
-      <div class="mb-3">
-        <label for="meterNumber" class="form-label">Meter Number</label>
-        <input type="text" class="form-control" id="meterNumber" placeholder="Enter Meter Number" required>
-      </div>
-      <div class="mb-3">
-        <label for="disco" class="form-label">Electricity Provider</label>
-        <select class="form-select" id="disco">
-          <option selected disabled>Select Provider</option>
-          <option value="ikeja-electric">Ikeja Electric</option>
-          <option value="eko-electric">Eko Electric</option>
-          <option value="abuja-electric">Abuja Electric (AEDC)</option>
-          <option value="phcn">PHCN</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="amount" class="form-label">Amount (₦)</label>
-        <input type="number" class="form-control" id="amount" placeholder="Enter Amount" required>
-      </div>
-    </form>
+<h1>Electricity Bill Payment</h1>
 
-    <h5 class="mt-4">Select Payment Method</h5>
-    <button onclick="togglePayment('pi')" class="btn btn-outline-secondary">Pay with Pi Network</button>
-    <button onclick="togglePayment('tacc')" class="btn btn-outline-secondary">Pay with TACC/BNB</button>
+<form id="electricityForm">
+  <label for="meterNumber">Meter Number:</label>
+  <input type="text" id="meterNumber" name="meterNumber" required />
 
-    <div id="piPayment" class="wallet-box" style="display:none;">
-      <strong>📲 Pay with Pi Network</strong><br>
-      Send payment to this wallet address:<br>
-      <code>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</code><br>
-      Then click confirm.
-      <button class="btn btn-primary">Confirm Pi Payment</button>
-    </div>
+  <label for="disco">Select DISCO:</label>
+  <select id="disco" name="disco" required>
+    <option value="">--Select Distribution Company--</option>
+    <option value="ikeja-electric">Ikeja Electric</option>
+    <option value="eko-electric">Eko Electric</option>
+    <option value="abuja-electric">Abuja Electric (AEDC)</option>
+    <option value="ibadan-electric">Ibadan Electric (IBEDC)</option>
+  </select>
 
-    <div id="taccPayment" class="wallet-box" style="display:none;">
-      <strong>💳 Pay with TACC / BNB (BSC Network)</strong><br>
-      Send payment to:<br>
-      <code>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code><br>
-      Then click confirm.
-      <button class="btn btn-primary">Confirm Crypto Payment</button>
-    </div>
+  <label for="amount">Amount (₦):</label>
+  <input type="number" id="amount" name="amount" required />
 
-    <footer>© 2025 Prof-Pay | Built for Africa’s Utility Needs</footer>
-  </div>
+  <label for="phone">Phone Number:</label>
+  <input type="text" id="phone" name="phone" required />
 
-  <script>
-    function togglePayment(method) {
-      document.getElementById('piPayment').style.display = (method === 'pi') ? 'block' : 'none';
-      document.getElementById('taccPayment').style.display = (method === 'tacc') ? 'block' : 'none';
-    }
-  </script>
+  <button type="submit">Proceed to Pay</button>
+</form>
+
+<div class="crypto-box">
+  <h3>✅ Multi-Crypto Payment Wallets (BEP-20)</h3>
+  <p><strong>TACC Wallet:</strong><br> 0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+  <p><strong>BNB & USDT:</strong><br> 0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+  <p><strong>Pi Wallet:</strong><br> GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</p>
+</div>
+
+<footer>
+  &copy; 2025 Prof-Pay | Powered by TACC & Pi Network | Built on BSC
+</footer>
+
+<script>
+  document.getElementById("electricityForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const meter = document.getElementById("meterNumber").value;
+    const disco = document.getElementById("disco").value;
+    const amount = document.getElementById("amount").value;
+    const phone = document.getElementById("phone").value;
+
+    alert(`✅ Payment simulated successfully for meter ${meter} on ${disco} - ₦${amount}`);
+  });
+</script>
+
 </body>
 </html>
