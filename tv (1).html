@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TV Subscription - Prof-Pay</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #1e1e2f;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+    }
+    h2 {
+      color: #1e1e2f;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input, select, button {
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      width: 100%;
+      max-width: 400px;
+      display: block;
+    }
+    .wallet-section {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .wallet-section h3 {
+      margin-bottom: 0.5rem;
+    }
+    .crypto-box {
+      background-color: #f0f0f0;
+      padding: 0.5rem;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Prof-Pay TV Subscription</h1>
+  </header>
+
+  <main>
+    <h2>Pay for Cable TV Subscription</h2>
+    <form id="tvForm">
+      <label for="provider">Select TV Provider</label>
+      <select id="provider" name="provider" required>
+        <option value="">-- Choose Provider --</option>
+        <option value="dstv">DStv</option>
+        <option value="gotv">GOtv</option>
+        <option value="startimes">Startimes</option>
+      </select>
+
+      <label for="smartcard">Smart Card Number</label>
+      <input type="text" id="smartcard" name="smartcard" required />
+
+      <label for="amount">Amount (₦)</label>
+      <input type="number" id="amount" name="amount" required />
+
+      <button type="submit">Proceed to Pay</button>
+    </form>
+
+    <div class="wallet-section">
+      <h3>💳 Crypto Payment (TACC / BNB / USDT)</h3>
+      <p>Send payment to this wallet (BEP20):</p>
+      <div class="crypto-box">
+        0x142B679A6b23B4720d81CE4beD9f4dAfE9803066
+      </div>
+    </div>
+
+    <div class="wallet-section">
+      <h3>🌐 Pi Network Payment</h3>
+      <p>Send Pi to this Pi Wallet:</p>
+      <div class="crypto-box">
+        GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Prof-Pay | Built on BSC + Pi Network
+  </footer>
+</body>
+</html>
