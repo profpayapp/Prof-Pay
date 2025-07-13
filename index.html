@@ -1,85 +1,134 @@
-<!DOCTYPE html><html lang="en">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prof-Pay Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prof-Pay | Home Dashboard</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f2f6fc;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+      color: white;
     }
     header {
-      background-color: #2e86de;
-      color: white;
+      background-color: #1e3c72;
       padding: 20px;
       text-align: center;
     }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      color: #00ffcc;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #16213E;
+      padding: 10px 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #00ffcc;
+    }
     .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
-      padding: 40px 20px;
+      margin-top: 40px;
     }
     .card {
-      background: white;
+      background-color: #1f4068;
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      transition: 0.3s ease;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,255,204,0.1);
+      transition: transform 0.3s ease;
     }
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 0 30px rgba(0,255,204,0.3);
     }
-    .card a {
-      text-decoration: none;
-      color: #2e86de;
-      font-size: 18px;
-      font-weight: bold;
-      display: block;
-      margin-top: 10px;
+    .card h3 {
+      color: #00ffcc;
+    }
+    .wallet-section {
+      margin-top: 60px;
+      padding: 20px;
+      background-color: #112d4e;
+      border-left: 5px solid #00ffcc;
+    }
+    .wallet-section p {
+      margin: 10px 0;
     }
     footer {
       text-align: center;
-      padding: 15px;
-      background: #d6eaff;
-      font-size: 14px;
-      color: #333;
+      margin-top: 60px;
+      padding: 20px;
+      background-color: #1e3c72;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>📱 Prof-Pay Service Dashboard</h1>
-    <p>Seamless Utility & Crypto Payment Access</p>
+    <h1>Welcome to Prof-Pay</h1>
+    <p>All-in-One Crypto + Utility Services</p>
   </header>
-  <main class="container">
-    <div class="card">
-      <h2>Airtime Recharge</h2>
-      <a href="airtime.html">Launch</a>
+  <nav>
+    <a href="utility.html">Utility</a>
+    <a href="airtime.html">Airtime</a>
+    <a href="data.html">Data</a>
+    <a href="electricity.html">Electricity</a>
+    <a href="tv.html">TV</a>
+  </nav>
+
+  <div class="container">
+    <h2>⚡ Quick Services Dashboard</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Buy Airtime</h3>
+        <p>MTN, Glo, Airtel, 9mobile</p>
+        <a href="airtime.html" style="color:#00ffcc;">Get Started →</a>
+      </div>
+      <div class="card">
+        <h3>Data Bundle</h3>
+        <p>Fast and affordable</p>
+        <a href="data.html" style="color:#00ffcc;">Buy Now →</a>
+      </div>
+      <div class="card">
+        <h3>Electricity Bill</h3>
+        <p>PHCN, IKEDC, AEDC, etc</p>
+        <a href="electricity.html" style="color:#00ffcc;">Pay Bill →</a>
+      </div>
+      <div class="card">
+        <h3>TV Subscription</h3>
+        <p>DStv, GOtv, Startimes</p>
+        <a href="tv.html" style="color:#00ffcc;">Renew Now →</a>
+      </div>
     </div>
-    <div class="card">
-      <h2>Data Bundle</h2>
-      <a href="data.html">Launch</a>
+
+    <div class="wallet-section">
+      <h3>💳 TACC / BNB Wallet Address</h3>
+      <p><strong>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</strong></p>
+      <p><em>Use for TACC, BNB, or USDT via Binance Smart Chain (BEP20)</em></p>
     </div>
-    <div class="card">
-      <h2>Electricity Bill</h2>
-      <a href="electricity.html">Launch</a>
-    </div>
-    <div class="card">
-      <h2>TV Subscription</h2>
-      <a href="tv.html">Launch</a>
-    </div>
-    <div class="card">
-      <h2>Wallet Tracker</h2>
-      <a href="wallet.html">View</a>
-    </div>
-  </main>
+  </div>
+
   <footer>
-    &copy; 2025 Prof-Pay. Powered by Crypto Prof | Built on BSC & TACC
+    <p>&copy; 2025 Prof-Pay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
