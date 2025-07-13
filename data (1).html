@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prof-Pay | Buy Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            padding: 10px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .wallet-section {
+            background: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+        .wallet-section h3 {
+            margin: 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prof-Pay | Buy Data</h1>
+
+    <div class="section">
+        <h2>Buy Data Bundle</h2>
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" placeholder="Enter phone number">
+
+        <label for="network">Select Network:</label>
+        <select id="network">
+            <option value="mtn">MTN</option>
+            <option value="glo">GLO</option>
+            <option value="airtel">Airtel</option>
+            <option value="9mobile">9Mobile</option>
+        </select>
+
+        <label for="amount">Amount (₦):</label>
+        <input type="number" id="amount" placeholder="Enter amount">
+
+        <button onclick="alert('✅ Data simulated for payment')">Proceed to Pay</button>
+    </div>
+
+    <div class="wallet-section">
+        <h3>💳 Crypto Wallet (TACC / BNB / USDT)</h3>
+        <p><strong>Send payment to:</strong></p>
+        <p><code>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code></p>
+        <p><strong>Network:</strong> Binance Smart Chain (BEP20)</p>
+    </div>
+
+    <div class="wallet-section">
+        <h3>🌐 Pi Network Wallet</h3>
+        <p><strong>Send Pi to:</strong></p>
+        <p><code>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</code></p>
+    </div>
+
+    <footer>
+        &copy; 2025 Prof-Pay | All Rights Reserved
+    </footer>
+</body>
+</html>
