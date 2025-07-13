@@ -1,106 +1,61 @@
-<!DOCTYPE html><html>
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>VTpass Airtime Sandbox</title>
-  <style>
-    body { font-family: Arial; padding: 20px; background-color: #f9f9f9; }
-    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
-    h2 { color: #2c3e50; }
-    input, select, button {
-      width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;
-    }
-    button { background-color: #2980b9; color: white; cursor: pointer; }
-    button:hover { background-color: #1c5980; }
-    .status { margin-top: 15px; font-weight: bold; color: green; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prof-Pay | Airtime Recharge</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 40px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; }
+        label { display: block; margin-top: 15px; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background-color: #2ecc71; color: white; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #27ae60; }
+        .wallet-box { background: #ecf0f1; padding: 15px; margin-top: 30px; border-left: 5px solid #3498db; }
+        .wallet-title { font-weight: bold; color: #2980b9; }
+        footer { text-align: center; margin-top: 40px; font-size: 14px; color: #999; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Buy Airtime (VTpass Sandbox)</h2>
-    <label>Phone Number:</label>
-    <input type="text" id="phone" placeholder="Enter phone number" /><label>Network:</label>
-<select id="network">
-  <option value="mtn">MTN</option>
-  <option value="glo">GLO</option>
-  <option value="airtel">AIRTEL</option>
-  <option value="etisalat">9MOBILE</option>
-</select>
+    <div class="container">
+        <h2>Buy Airtime (VTpass Sandbox)</h2>
+        <label for="phone">Phone Number:</label>
+        <input type="text" id="phone" placeholder="Enter phone number">
 
-<label>Amount:</label>
-<input type="number" id="amount" placeholder="Amount (e.g. 100)" />
+        <label for="network">Network:</label>
+        <select id="network">
+            <option value="mtn">MTN</option>
+            <option value="glo">GLO</option>
+            <option value="airtel">AIRTEL</option>
+            <option value="9mobile">9MOBILE</option>
+        </select>
 
-<button onclick="buyAirtime()">Proceed to Pay</button>
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" placeholder="Enter amount">
 
-<div class="status" id="status"></div>
+        <button onclick="simulatePayment()">Proceed to Pay</button>
 
-  </div>  <script>
-    function buyAirtime() {
-      const statusBox = document.getElementById("status");
-      statusBox.textContent = "Processing...";
+        <div class="wallet-box">
+            <div class="wallet-title">💳 TACC / BNB Wallet Address (BSC)</div>
+            <p>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+        </div>
 
-      const payload = {
-        request_id: "req_" + Date.now(),
-        serviceID: document.getElementById("network").value,
-        billersCode: document.getElementById("phone").value,
-        variation_code: "",
-        amount: document.getElementById("amount").value,
-        phone: document.getElementById("phone").value
-      };
+        <div class="wallet-box">
+            <div class="wallet-title">⚡ Pi Network Wallet Address</div>
+            <p>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</p>
+        </div>
+    </div>
 
-      fetch("https://sandbox.vtpass.com/api/pay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "api-key": "sandbox",
-          "username": "sandbox@vtpass.com",
-          "password": "sandbox"
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (data.code === "000") {
-          statusBox.textContent = "✅ Success! Airtime purchased.";
-        } else {
-          statusBox.textContent = "❌ Error: " + data.response_description;
+    <footer>
+        &copy; 2025 Prof-Pay | Powered by Pi Network & Binance Smart Chain
+    </footer>
+
+    <script>
+        function simulatePayment() {
+            alert('✅ Airtime purchase simulated for ' + document.getElementById("phone").value + ' on ' + document.getElementById("network").value.toUpperCase() + ' - ₦' + document.getElementById("amount").value);
         }
-      })
-      .catch(err => {
-        console.error(err);
-        statusBox.textContent = "❌ Network error occurred.";
-      });
-    } <!-- TACC Wallet Tracker UI -->
-<div class="wallet-tracker" style="margin-top:40px; padding:20px; background:#f0f0f0; border-radius:10px;">
-  <h3>💳 TACC Wallet Tracker</h3>
-  <p><strong>Your Wallet:</strong></p>
-  <div style="background:#fff; padding:10px; border-radius:5px; word-break:break-all;">
-    0x142B679A6b23B4720d81CE4beD9f4dAfE9803066
-  </div>
-  <p style="margin-top:10px;">On Binance Smart Chain (BEP20)</p>
-  <p style="color:#2e86de; font-weight:bold;">📡 Tracking Status: Connected</p>
-</div>
-<!-- End of TACC Wallet Tracker --> <!-- 🪙 Crypto Payment Section (TACC) -->
-<div style="background:#f1f1f1;padding:20px;margin-top:30px;border-radius:10px;">
-  <h3>💳 Pay with TACC (Crypto)</h3>
-  <p>Please send payment to the wallet address below:</p>
-
-  <div style="background:#fff;padding:15px;border:1px solid #ccc;border-radius:8px;word-break:break-all;">
-    <strong>Wallet Address:</strong><br>
-    <code id="walletAddress">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code>
-    <br><br>
-    <button onclick="copyAddress()" style="background:#2e86de;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;">📋 Copy Address</button>
-  </div>
-
-  <p style="margin-top:15px;">After making the payment, click the button below to verify or notify us:</p>
-  <button onclick="alert('✅ Payment verification coming soon. Thank you!')" style="background:#28a745;color:#fff;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;">✅ I Have Paid</button>
-</div>
-
-<script>
-  function copyAddress() {
-    const copyText = document.getElementById("walletAddress").textContent;
-    navigator.clipboard.writeText(copyText);
-    alert("✅ Wallet address copied to clipboard!");
-  }
-</script>
-  </script></body>
+    </script>
+</body>
 </html>
