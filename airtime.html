@@ -1,104 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- airtime.html with EmailJS integration --><!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Buy Airtime - Prof-Pay</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airtime Recharge | Prof-Pay</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("gebhXXueNgB9sqzoX");
+    })();
+  </script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f4f8;
-      padding: 20px;
-      color: #333;
-    }
-    h2 {
-      text-align: center;
-      color: #0d47a1;
-    }
-    form {
-      max-width: 400px;
-      margin: auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin: 12px 0 6px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #0d47a1;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #1565c0;
-    }
-    .wallet-section {
-      margin-top: 30px;
-      background: #e3f2fd;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-    .wallet-section code {
-      word-break: break-all;
-    }
+    body { font-family: Arial; padding: 20px; }
+    input, select, button { display: block; margin: 10px 0; padding: 8px; width: 100%; max-width: 400px; }
+    button { background-color: #00b894; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #019875; }
   </style>
 </head>
-<body>
-
-  <h2>Buy Airtime (VTpass Sandbox)</h2>
+<body>  <h2>Airtime Recharge</h2>
   <form id="airtimeForm">
-    <label for="phone">Phone Number:</label>
-    <input type="text" id="phone" required />
-
-    <label for="network">Select Network:</label>
-    <select id="network" required>
-      <option value="">-- Choose Network --</option>
-      <option value="mtn">MTN</option>
-      <option value="airtel">Airtel</option>
-      <option value="glo">GLO</option>
-      <option value="9mobile">9mobile</option>
+    <input type="email" name="user_email" placeholder="Your Email" required>
+    <input type="tel" name="user_phone" placeholder="Phone Number" required>
+    <select name="network">
+      <option value="MTN">MTN</option>
+      <option value="GLO">GLO</option>
+      <option value="AIRTEL">AIRTEL</option>
+      <option value="9MOBILE">9MOBILE</option>
     </select>
+    <input type="number" name="amount" placeholder="Amount (₦)" required><input type="hidden" name="payment_type" value="TACC">
+<input type="hidden" name="transaction_id" id="txn_id">
+<input type="hidden" name="crypto_wallet" value="0x142B679A6b23B4720d81CE4beD9f4dAfE9803066">
 
-    <label for="amount">Amount:</label>
-    <input type="number" id="amount" required />
+<button type="submit">Proceed to Pay</button>
 
-    <button type="submit">Proceed to Pay</button>
-  </form>
-
-  <!-- TACC/BNB Wallet Info -->
-  <div class="wallet-section">
-    <h3>💳 Crypto Payment Wallet</h3>
-    <p><strong>Supported Tokens:</strong> TACC, BNB, USDT</p>
-    <p><strong>Blockchain:</strong> Binance Smart Chain (BEP20)</p>
-    <p><strong>Wallet Address:</strong></p>
-    <code>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code>
-  </div>
-
-  <!-- Pi Network Wallet Info -->
-  <div class="wallet-section">
-    <h3>🌐 Pi Network Payment</h3>
-    <p><strong>Send Pi to Wallet:</strong></p>
-    <code>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</code>
-  </div>
-
-  <script>
-    document.getElementById("airtimeForm").addEventListener("submit", function (e) {
+  </form>  <script>
+    document.getElementById("airtimeForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      alert("✅ Airtime purchase simulated for " + document.getElementById("phone").value + " on " + document.getElementById("network").value.toUpperCase() + " - ₦" + document.getElementById("amount").value);
-    });
-  </script>
 
-</body>
+      const form = this;
+      const txnId = "TACC" + Date.now();
+      document.getElementById("txn_id").value = txnId;
+
+      emailjs.sendForm("service_yp78a8k", "template_ktt6pfl", form)
+        .then(() => {
+          alert("✅ Airtime payment simulated and email sent successfully!");
+          form.reset();
+        }, (error) => {
+          alert("❌ Failed to send email: " + error.text);
+        });
+    });
+  </script>  <footer>
+    <p>© 2025 Prof-Pay | Built on BSC Network</p>
+  </footer></body>
 </html>
