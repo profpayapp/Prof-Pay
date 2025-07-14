@@ -3,110 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prof-Pay | Electricity Payment</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #f0f2f5, #e2e8f0);
-      padding: 20px;
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      color: #007bff;
-    }
-    form {
-      max-width: 500px;
-      margin: 20px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      padding: 12px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 16px;
-    }
-    .crypto-box {
-      background: #f8fafc;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-    }
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #666;
-    }
-  </style>
+  <title>Pay Electricity Bill - Prof-Pay</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="container">
+    <h2>Electricity Bill Payment (VTpass Sandbox)</h2>
+    <label>Meter Number:</label>
+    <input type="text" id="meter" placeholder="Enter meter number" />
+    <label>Disco:</label>
+    <select id="disco">
+      <option value="aedc">AEDC</option>
+      <option value="ekedc">EKEDC</option>
+      <option value="ikedc">IKEDC</option>
+      <option value="phed">PHED</option>
+    </select>
+    <label>Amount:</label>
+    <input type="number" id="amount" placeholder="Amount" />
+    <button onclick="simulateElectricity()">Proceed to Pay</button>
+    <div id="result"></div>
+  </div>
 
-<h1>Electricity Bill Payment</h1>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    emailjs.init("gebhXXueNgB9sqzoX");
 
-<form id="electricityForm">
-  <label for="meterNumber">Meter Number:</label>
-  <input type="text" id="meterNumber" name="meterNumber" required />
+    function simulateElectricity() {
+      const meter = document.getElementById("meter").value;
+      const disco = document.getElementById("disco").value;
+      const amount = document.getElementById("amount").value;
+      const userEmail = prompt("Enter your email for receipt:");
+      const userPhone = meter;
+      const transactionId = "ELEC" + Date.now();
+      const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
 
-  <label for="disco">Select DISCO:</label>
-  <select id="disco" name="disco" required>
-    <option value="">--Select Distribution Company--</option>
-    <option value="ikeja-electric">Ikeja Electric</option>
-    <option value="eko-electric">Eko Electric</option>
-    <option value="abuja-electric">Abuja Electric (AEDC)</option>
-    <option value="ibadan-electric">Ibadan Electric (IBEDC)</option>
-  </select>
+      if (!userEmail || !userPhone || !amount) {
+        alert("All fields are required.");
+        return;
+      }
 
-  <label for="amount">Amount (₦):</label>
-  <input type="number" id="amount" name="amount" required />
+      document.getElementById("result").innerHTML =
+        "✅ Electricity payment simulated for meter " +
+        meter +
+        " with " +
+        disco.toUpperCase() +
+        " - ₦" +
+        amount;
 
-  <label for="phone">Phone Number:</label>
-  <input type="text" id="phone" name="phone" required />
-
-  <button type="submit">Proceed to Pay</button>
-</form>
-
-<div class="crypto-box">
-  <h3>✅ Multi-Crypto Payment Wallets (BEP-20)</h3>
-  <p><strong>TACC Wallet:</strong><br> 0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
-  <p><strong>BNB & USDT:</strong><br> 0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
-  <p><strong>Pi Wallet:</strong><br> GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</p>
-</div>
-
-<footer>
-  &copy; 2025 Prof-Pay | Powered by TACC & Pi Network | Built on BSC
-</footer>
-
-<script>
-  document.getElementById("electricityForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    const meter = document.getElementById("meterNumber").value;
-    const disco = document.getElementById("disco").value;
-    const amount = document.getElementById("amount").value;
-    const phone = document.getElementById("phone").value;
-
-    alert(`✅ Payment simulated successfully for meter ${meter} on ${disco} - ₦${amount}`);
-  });
-</script>
-
+      emailjs.send("service_yp78a8k", "template_ktt6pfl", {
+        user_email: userEmail,
+        user_phone: userPhone,
+        payment_type: "Electricity Bill",
+        amount: amount,
+        transaction_id: transactionId,
+        crypto_wallet: walletAddress,
+      });
+    }
+  </script>
 </body>
 </html>
