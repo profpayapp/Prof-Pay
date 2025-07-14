@@ -3,123 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prof-Pay | Buy Data</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #4b0082;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    main {
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    label {
-      display: block;
-      margin-top: 1rem;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 0.7rem;
-      margin-top: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #4b0082;
-      color: white;
-      border: none;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    .success, .error {
-      margin-top: 1rem;
-      padding: 0.8rem;
-      border-radius: 5px;
-      text-align: center;
-    }
-    .success { background: #c8e6c9; color: #2e7d32; }
-    .error { background: #ffcdd2; color: #c62828; }
-    footer {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #777;
-    }
-    .wallet-section {
-      margin-top: 2rem;
-      background: #f8f8f8;
-      padding: 1rem;
-      border-radius: 8px;
-      border-left: 5px solid #4b0082;
-    }
-  </style>
+  <title>Buy Data - Prof-Pay</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Prof-Pay: Buy Data</h1>
-  </header>
-
-  <main>
-    <label for="phone">Phone Number:</label>
-    <input type="text" id="phone" placeholder="Enter phone number" />
-
-    <label for="network">Select Network:</label>
+  <div class="container">
+    <h2>Buy Data (VTpass Sandbox)</h2>
+    <label>Phone Number:</label>
+    <input type="text" id="phone" placeholder="Enter your number" />
+    <label>Network:</label>
     <select id="network">
       <option value="mtn">MTN</option>
       <option value="glo">GLO</option>
       <option value="airtel">AIRTEL</option>
       <option value="9mobile">9MOBILE</option>
     </select>
+    <label>Amount:</label>
+    <input type="number" id="amount" placeholder="Amount" />
+    <button onclick="simulatePayment()">Proceed to Pay</button>
+    <div id="result"></div>
+  </div>
 
-    <label for="amount">Amount (₦):</label>
-    <input type="number" id="amount" placeholder="Enter amount" />
-
-    <button onclick="processData()">Proceed to Pay</button>
-
-    <div id="message"></div>
-
-    <!-- ✅ MULTI-CRYPTO WALLET SECTION -->
-    <div class="wallet-section">
-      <h3>Send Payment To:</h3>
-      <p><strong>TACC / BNB / USDT (BEP20):</strong><br>
-      <code>0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code></p>
-
-      <p><strong>Pi Network Wallet:</strong><br>
-      <code>GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG</code></p>
-    </div>
-  </main>
-
-  <footer>
-    &copy; 2025 Prof-Pay | Built on BSC & Pi Network
-  </footer>
-
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <script>
-    function processData() {
-      const phone = document.getElementById('phone').value;
-      const network = document.getElementById('network').value;
-      const amount = document.getElementById('amount').value;
-      const messageBox = document.getElementById('message');
+    emailjs.init("gebhXXueNgB9sqzoX");
 
-      if (!phone || !amount) {
-        messageBox.innerHTML = `<div class="error">❌ Please fill all fields.</div>`;
+    function simulatePayment() {
+      const phone = document.getElementById("phone").value;
+      const network = document.getElementById("network").value;
+      const amount = document.getElementById("amount").value;
+      const userEmail = prompt("Enter your email for receipt:");
+      const userPhone = phone;
+      const transactionId = "TXN" + Date.now();
+      const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+
+      if (!userEmail || !userPhone || !amount) {
+        alert("All fields are required.");
         return;
       }
 
-      // ✅ Simulate Payment Message
-      messageBox.innerHTML = `<div class="success">✅ Data purchase simulated for ${phone} on ${network.toUpperCase()} - ₦${amount}</div>`;
+      document.getElementById("result").innerHTML =
+        "✅ Data purchase simulated for " +
+        phone +
+        " on " +
+        network.toUpperCase() +
+        " - ₦" +
+        amount;
+
+      // Send confirmation email
+      emailjs.send("service_yp78a8k", "template_ktt6pfl", {
+        user_email: userEmail,
+        user_phone: userPhone,
+        payment_type: "Data Bundle",
+        amount: amount,
+        transaction_id: transactionId,
+        crypto_wallet: walletAddress,
+      });
     }
   </script>
 </body>
