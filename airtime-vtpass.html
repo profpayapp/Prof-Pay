@@ -1,58 +1,79 @@
-<script>
-  const form = document.getElementById('airtimeForm');
-  const msg = document.getElementById('responseMsg');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Airtime Purchase (Sandbox)</title>
+</head>
+<body>
+  <h2>VTpass Airtime Purchase (Sandbox)</h2>
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    msg.textContent = 'Processing...';
+  <form id="airtimeForm">
+    <label>Phone Number:</label><br>
+    <input type="text" id="phone" placeholder="e.g. 07012345678" required><br><br>
 
-    const phone = document.getElementById('phone').value;
-    const network = document.getElementById('network').value;
-    const amount = document.getElementById('amount').value;
+    <label>Network:</label><br>
+    <select id="network" required>
+      <option value="mtn">MTN</option>
+      <option value="airtel">Airtel</option>
+      <option value="glo">Glo</option>
+      <option value="etisalat">9mobile</option>
+    </select><br><br>
 
-    // VTpass requires serviceID like: "mtn", "glo", "airtel", "etisalat"
-    const serviceID = network;
+    <label>Amount (₦):</label><br>
+    <input type="number" id="amount" required><br><br>
 
-    // Generate a valid Request ID in correct format
-    const date = new Date();
-    const request_id =
-      date.getFullYear().toString() +
-      String(date.getMonth() + 1).padStart(2, '0') +
-      String(date.getDate()).padStart(2, '0') +
-      String(date.getHours()).padStart(2, '0') +
-      String(date.getMinutes()).padStart(2, '0') +
-      String(Math.floor(Math.random() * 100000)); // Add randomness
+    <button type="submit">Send Airtime</button>
+  </form>
 
-    const payload = {
-      request_id,
-      serviceID,
-      billersCode: phone,
-      amount,
-      phone
-    };
+  <p id="responseMsg"></p>
 
-    try {
-      const response = await fetch('https://sandbox.vtpass.com/api/pay', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': '6e42765736a76d61f25b1073866f2947',
-          'Authorization': 'Basic ' + btoa('PK_6674c3f579be5f6fc7055c53cf949ebaf51c6ab714d:SK_399627c47bc2053d6ec3b36be66e1311277d3643d05')
-        },
-        body: JSON.stringify(payload)
-      });
+  <script>
+    const form = document.getElementById('airtimeForm');
+    const msg = document.getElementById('responseMsg');
 
-      const result = await response.json();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Processing...';
 
-      if (result.code === '000') {
-        msg.textContent = `✅ Airtime sent successfully to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
-      } else {
-        msg.textContent = `❌ Error: ${result.response_description || result.message || 'Check Request ID or ServiceID'}`;
+      const phone = document.getElementById('phone').value;
+      const network = document.getElementById('network').value;
+      const amount = document.getElementById('amount').value;
+
+      const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random()*1000);
+
+      const payload = {
+        request_id,
+        serviceID: network,
+        billersCode: phone,
+        variation_code: "",
+        amount,
+        phone
+      };
+
+      try {
+        const res = await fetch('https://sandbox.vtpass.com/api/pay', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': '6e42765736a76d61f25b1073866f2947',
+            'Authorization': 'Basic ' + btoa('sandbox@vtpass.com:sandbox')
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (data.code === '000') {
+          msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
+        } else {
+          msg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
+        }
+      } catch (err) {
+        msg.textContent = '❌ Network error, please try again.';
+        console.error(err);
       }
-
-    } catch (error) {
-      msg.textContent = '❌ Network error, please try again.';
-      console.error(error);
-    }
-  });
-</script>
+    });
+  </script>
+</body>
+</html>
