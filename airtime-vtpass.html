@@ -81,6 +81,11 @@
         msg.textContent = '❌ Network error, please try again.';
       }
     });
-  </script>
+  </if (data.code === '000') {
+  msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
+} else {
+  console.log("Full VTpass Response:", data);
+  msg.textContent = `❌ API Error:\n${JSON.stringify(data, null, 2)}`;
+}>
 </body>
 </html>
