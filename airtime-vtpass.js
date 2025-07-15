@@ -5,17 +5,23 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   msg.textContent = 'Processing...';
 
-  const phone = document.getElementById('phone').value;
-  const network = document.getElementById('network').value;
+  const phone = document.getElementById('phone').value.trim();
+  const network = document.getElementById('network').value.trim().toLowerCase();
   const amount = document.getElementById('amount').value;
 
-  const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random() * 10000);
+  const timestamp = new Date();
+  const request_id = timestamp.getFullYear().toString() +
+    String(timestamp.getMonth() + 1).padStart(2, '0') +
+    String(timestamp.getDate()).padStart(2, '0') +
+    String(timestamp.getHours()).padStart(2, '0') +
+    String(timestamp.getMinutes()).padStart(2, '0') +
+    Math.floor(Math.random() * 1000);
 
   const payload = {
-    request_id,
+    request_id: request_id,
     serviceID: network,
-    amount,
-    phone
+    amount: amount,
+    phone: phone
   };
 
   try {
@@ -30,15 +36,15 @@ form.addEventListener('submit', async (e) => {
     });
 
     const data = await response.json();
-    console.log(data);
+    console.log('📦 API Response:', data);
 
     if (data.code === '000') {
       msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
     } else {
-      msg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
+      msg.textContent = `❌ Error: ${data.response_description || data.responseMessage || data.message || 'Unknown error'}`;
     }
   } catch (err) {
-    console.error(err);
+    console.error('❌ Network/API Error:', err);
     msg.textContent = '❌ Network error, please try again.';
   }
 });
