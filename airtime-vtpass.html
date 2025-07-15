@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VTpass Airtime Purchase (Sandbox)</title>
+</head>
+<body>
+  <h2>VTpass Airtime Purchase (Sandbox)</h2>
+
+  <form id="airtimeForm">
+    <label>Phone Number:</label><br>
+    <input type="text" id="phone" placeholder="e.g. 07012345678" required><br><br>
+
+    <label>Network:</label><br>
+    <select id="network" required>
+      <option value="mtn">MTN</option>
+      <option value="airtel">Airtel</option>
+      <option value="glo">Glo</option>
+      <option value="etisalat">9mobile</option>
+    </select><br><br>
+
+    <label>Amount (₦):</label><br>
+    <input type="number" id="amount" required><br><br>
+
+    <button type="submit">Send Airtime</button>
+  </form>
+
+  <p id="responseMsg"></p>
+
+  <!-- External JavaScript File -->
+  <script src="airtime-vtpass.js"></script>
+</body>
+</html>
