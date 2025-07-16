@@ -28,7 +28,6 @@
 
   <p id="responseMsg"></p>
 
-  <!-- Your VTpass JavaScript code -->
   <script>
     const form = document.getElementById('airtimeForm');
     const msg = document.getElementById('responseMsg');
@@ -41,13 +40,14 @@
       const network = document.getElementById('network').value;
       const amount = document.getElementById('amount').value;
 
-      const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random() * 10000);
+      const now = new Date();
+      const request_id = now.toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random() * 10000);
 
       const payload = {
-        request_id,
+        request_id: request_id,
         serviceID: network,
-        amount,
-        phone
+        amount: amount,
+        phone: phone
       };
 
       try {
@@ -62,7 +62,7 @@
         });
 
         const data = await res.json();
-        console.log(data); // Debugging output
+        console.log(data);
 
         if (data.code === '000') {
           msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
