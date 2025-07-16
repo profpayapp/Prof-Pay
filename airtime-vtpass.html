@@ -26,9 +26,54 @@
     <button type="submit">Send Airtime</button>
   </form>
 
-  <p id="responseMsg"></p>
+  <pre id="responseMsg" style="white-space: pre-wrap; margin-top: 20px; color: darkblue;"></pre>
 
-  <!-- ✅ LINK TO EXTERNAL JS FILE -->
-  <script src="airtime-vtpass.js"></script>
+  <script>
+    const form = document.getElementById('airtimeForm');
+    const msg = document.getElementById('responseMsg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Processing...';
+
+      const phone = document.getElementById('phone').value;
+      const network = document.getElementById('network').value;
+      const amount = document.getElementById('amount').value;
+
+      const now = new Date();
+      const timestamp = now.getFullYear().toString()
+        + String(now.getMonth() + 1).padStart(2, '0')
+        + String(now.getDate()).padStart(2, '0')
+        + String(now.getHours()).padStart(2, '0')
+        + String(now.getMinutes()).padStart(2, '0');
+
+      const request_id = timestamp + Math.floor(Math.random() * 10000);
+
+      const payload = {
+        request_id,
+        serviceID: network,
+        billersCode: phone,
+        amount,
+        phone
+      };
+
+      try {
+        const res = await fetch('https://sandbox.vtpass.com/api/pay', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': '6e42765736a76d61f25b1073866f2947',
+            'Authorization': 'Basic ' + btoa('PK_6674c3f579be5f6fc7055c53cf949ebaf51c6ab714d:SK_399627c47bc2053d6ec3b36be66e1311277d3643d05')
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        msg.textContent = JSON.stringify(data, null, 2); // Show full response
+      } catch (err) {
+        msg.textContent = '❌ Network error: ' + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
