@@ -2,80 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VTpass Airtime Purchase (Sandbox)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background: #f4f4f4; }
+    h2 { color: #333; }
+    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+    label { display: block; margin-top: 10px; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    button { background-color: #28a745; color: white; border: none; }
+    button:hover { background-color: #218838; }
+    .result { margin-top: 15px; font-weight: bold; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
 </head>
 <body>
   <h2>VTpass Airtime Purchase (Sandbox)</h2>
-
   <form id="airtimeForm">
-    <label>Phone Number:</label><br>
-    <input type="text" id="phone" placeholder="e.g. 07012345678" required><br><br>
+    <label>Phone Number:
+      <input type="text" id="phone" placeholder="e.g. 07012345678" required />
+    </label>
 
-    <label>Network:</label><br>
-    <select id="network" required>
-      <option value="mtn">MTN</option>
-      <option value="airtel">Airtel</option>
-      <option value="glo">Glo</option>
-      <option value="etisalat">9mobile</option>
-    </select><br><br>
+    <label>Network:
+      <select id="network" required>
+        <option value="mtn">MTN</option>
+        <option value="airtel">Airtel</option>
+        <option value="glo">GLO</option>
+        <option value="etisalat">9mobile</option>
+      </select>
+    </label>
 
-    <label>Amount (₦):</label><br>
-    <input type="number" id="amount" required><br><br>
+    <label>Amount (₦):
+      <input type="number" id="amount" required />
+    </label>
 
     <button type="submit">Send Airtime</button>
+    <div id="result" class="result"></div>
   </form>
 
-  <p id="responseMsg"></p>
-
   <script>
-    const form = document.getElementById('airtimeForm');
-    const msg = document.getElementById('responseMsg');
-
-    form.addEventListener('submit', async (e) => {
+    document.getElementById('airtimeForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      msg.textContent = 'Processing...';
+      const result = document.getElementById('result');
+      result.textContent = 'Processing...';
 
       const phone = document.getElementById('phone').value;
       const network = document.getElementById('network').value;
       const amount = document.getElementById('amount').value;
-
-      const timestamp = new Date();
-      const request_id = timestamp.getFullYear().toString() +
-                         String(timestamp.getMonth()+1).padStart(2, '0') +
-                         String(timestamp.getDate()).padStart(2, '0') +
-                         String(timestamp.getHours()).padStart(2, '0') +
-                         String(timestamp.getMinutes()).padStart(2, '0') +
-                         String(timestamp.getSeconds()).padStart(2, '0');
-
-      const payload = {
-        request_id: request_id,
-        serviceID: network,
-        amount: amount,
-        phone: phone
-      };
 
       try {
         const response = await fetch('https://sandbox.vtpass.com/api/pay', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'api-key': '6e42765736a76d61f25b1073866f2947',
-            'Authorization': 'Basic ' + btoa('PK_83813c6cea21721948ec5bffd2abb6c9ff3860bb0f7:SK_26764a7c8af0b214739c133b82df2b5746ffc436a65')
+            'Authorization': 'Basic ' + btoa('firstcometbc@gmail.com:@Ahmad@1242@')
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            request_id: 'req_' + Date.now(),
+            serviceID: network + '_airtime',
+            billersCode: phone,
+            amount: amount,
+            phone: phone
+          })
         });
 
         const data = await response.json();
         console.log(data);
 
-        if (data.code === '000') {
-          msg.textContent = `✅ Airtime sent successfully to ${phone} - ₦${amount}`;
+        if (response.ok && data.code === '000') {
+          result.textContent = '✅ Success: ' + data.response_description;
+          result.className = 'result success';
         } else {
-          msg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
+          result.textContent = '❌ Error: ' + (data.response_description || 'Unknown error');
+          result.className = 'result error';
         }
       } catch (error) {
         console.error(error);
-        msg.textContent = '❌ Network error. Please try again.';
+        result.textContent = '❌ Error: ' + error.message;
+        result.className = 'result error';
       }
     });
   </script>
