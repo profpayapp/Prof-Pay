@@ -83,6 +83,42 @@
         result.className = 'result error';
       }
     });
-  </script>
-</body>
+  </script> 
+</body><script>
+  document.getElementById('airtime-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const phone = document.getElementById('phone').value;
+    const network = document.getElementById('network').value;
+    const amount = document.getElementById('amount').value;
+
+    fetch('https://sandbox.vtpass.com/api/pay', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'username': 'firstcometbc@gmail.com',
+        'password': '@Ahmad@1242@',
+      },
+      body: JSON.stringify({
+        request_id: 'req_' + Date.now(),
+        serviceID: network, // ✅ THIS IS THE FIXED LINE
+        billersCode: phone,
+        amount: amount,
+        phone: phone
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.code === '000') {
+        document.getElementById('result').innerHTML = '✅ Success: Airtime sent!';
+      } else {
+        document.getElementById('result').innerHTML = '❌ Error: ' + data.response_description;
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      document.getElementById('result').innerHTML = '❌ Error: Something went wrong';
+    });
+  });
+</script>
 </html>
