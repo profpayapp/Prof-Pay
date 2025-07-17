@@ -1,71 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VTpass Airtime Purchase (Sandbox)</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select {
-      padding: 8px;
-      width: 100%;
-      margin-top: 5px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 15px;
-    }
-    #responseMsg {
-      margin-top: 15px;
-      font-weight: bold;
-      color: red;
-    }
-  </style>
 </head>
 <body>
   <h2>VTpass Airtime Purchase (Sandbox)</h2>
-  <form id="airtimeForm">
-    <label for="phone">Phone Number:</label>
-    <input type="text" id="phone" placeholder="e.g. 07012345678" required>
 
-    <label for="network">Network:</label>
-    <select id="network">
+  <form id="airtimeForm">
+    <label>Phone Number:</label><br>
+    <input type="text" id="phone" placeholder="e.g. 07012345678" required><br><br>
+
+    <label>Network:</label><br>
+    <select id="network" required>
       <option value="mtn">MTN</option>
       <option value="airtel">Airtel</option>
       <option value="glo">Glo</option>
       <option value="etisalat">9mobile</option>
-    </select>
+    </select><br><br>
 
-    <label for="amount">Amount (₦):</label>
-    <input type="number" id="amount" required>
+    <label>Amount (₦):</label><br>
+    <input type="number" id="amount" required><br><br>
 
     <button type="submit">Send Airtime</button>
   </form>
 
-  <div id="responseMsg"></div>
+  <p id="responseMsg"></p>
 
   <script>
-    const airtimeForm = document.getElementById('airtimeForm');
-    const responseMsg = document.getElementById('responseMsg');
+    const form = document.getElementById('airtimeForm');
+    const msg = document.getElementById('responseMsg');
 
-    airtimeForm.addEventListener('submit', async function (e) {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      responseMsg.textContent = "Processing...";
+      msg.textContent = 'Processing...';
 
       const phone = document.getElementById('phone').value;
       const network = document.getElementById('network').value;
       const amount = document.getElementById('amount').value;
-      const request_id = new Date().getTime().toString();
+
+      const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random()*1000);
 
       const payload = {
         request_id: request_id,
         serviceID: network,
+        billersCode: phone,
+        variation_code: "",
         amount: amount,
         phone: phone
       };
@@ -76,7 +57,7 @@
           headers: {
             'Content-Type': 'application/json',
             'api-key': '6e42765736a76d61f25b1073866f2947',
-            'Authorization': 'Basic ' + btoa('PK_604116c8001a8f9af6d982a1cb3768b6699c6b430a0:SK_30228f7d7d5ea6410cd8732d5ae00392b3a7c138c63')
+            'Authorization': 'Basic ' + btoa('PK_83813c6cea21721948ec5bffd2abb6c9ff3860bb0f7:SK_26764a7c8af0b214739c133b82df2b5746ffc436a65')
           },
           body: JSON.stringify(payload)
         });
@@ -85,15 +66,13 @@
         console.log(data);
 
         if (data.code === '000') {
-          responseMsg.style.color = "green";
-          responseMsg.textContent = `✅ Success: ₦${amount} sent to ${phone} on ${network.toUpperCase()}`;
+          msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
         } else {
-          responseMsg.style.color = "red";
-          responseMsg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
+          msg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
         }
       } catch (err) {
         console.error(err);
-        responseMsg.textContent = "❌ Network error, please try again.";
+        msg.textContent = '❌ Network error, please try again.';
       }
     });
   </script>
