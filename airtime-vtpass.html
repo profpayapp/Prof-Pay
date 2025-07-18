@@ -4,24 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VTpass Airtime Purchase (Sandbox)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
+    }
+    label, input, select, button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    #responseMsg {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h2>VTpass Airtime Purchase (Sandbox)</h2>
+
+  <h2 style="text-align:center;">VTpass Airtime Purchase (Sandbox)</h2>
 
   <form id="airtimeForm">
-    <label>Phone Number:</label><br>
-    <input type="text" id="phone" required><br><br>
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" placeholder="e.g. 08138838838" required>
 
-    <label>Network:</label><br>
+    <label for="network">Network:</label>
     <select id="network" required>
       <option value="mtn">MTN</option>
       <option value="airtel">Airtel</option>
       <option value="glo">Glo</option>
       <option value="etisalat">9mobile</option>
-    </select><br><br>
+    </select>
 
-    <label>Amount (₦):</label><br>
-    <input type="number" id="amount" required><br><br>
+    <label for="amount">Amount (₦):</label>
+    <input type="number" id="amount" placeholder="e.g. 200" required>
 
     <button type="submit">Send Airtime</button>
   </form>
@@ -40,7 +65,7 @@
       const network = document.getElementById('network').value;
       const amount = document.getElementById('amount').value;
 
-      const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random() * 10000);
+      const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random() * 1000);
 
       const payload = {
         request_id,
@@ -50,7 +75,7 @@
       };
 
       try {
-        const res = await fetch('https://sandbox.vtpass.com/api/pay', {
+        const response = await fetch('https://sandbox.vtpass.com/api/pay', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,19 +85,21 @@
           body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
-        console.log(data); // for debugging
+        const data = await response.json();
+        console.log(data);
 
         if (data.code === '000') {
-          msg.textContent = `✅ Airtime sent to ${phone} - ₦${amount}`;
+          msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
         } else {
           msg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
         }
+
       } catch (err) {
         console.error(err);
-        msg.textContent = '❌ Network or server error.';
+        msg.textContent = '❌ Network error, please try again.';
       }
     });
   </script>
+
 </body>
 </html>
