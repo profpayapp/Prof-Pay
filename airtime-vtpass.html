@@ -1,59 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VTpass Airtime Purchase (Sandbox)</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 400px;
-      margin: auto;
-    }
-    label, input, select, button {
-      width: 100%;
-      margin-top: 10px;
-    }
-    #responseMsg {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+    input, select, button { width: 100%; padding: 10px; margin-bottom: 15px; }
+    h2 { text-align: center; }
+    #responseMsg { text-align: center; font-weight: bold; }
   </style>
 </head>
 <body>
+  <h2>VTpass Airtime Purchase (Sandbox)</h2>  <form id="airtimeForm">
+    <label>Phone Number:</label>
+    <input type="text" id="phone" placeholder="e.g. 08138838838" required><label>Network:</label>
+<select id="network" required>
+  <option value="mtn">MTN</option>
+  <option value="airtel">Airtel</option>
+  <option value="glo">Glo</option>
+  <option value="etisalat">9mobile</option>
+</select>
 
-  <h2 style="text-align:center;">VTpass Airtime Purchase (Sandbox)</h2>
+<label>Amount (₦):</label>
+<input type="number" id="amount" placeholder="e.g. 200" required>
 
-  <form id="airtimeForm">
-    <label for="phone">Phone Number:</label>
-    <input type="text" id="phone" placeholder="e.g. 08138838838" required>
+<button type="submit">Send Airtime</button>
 
-    <label for="network">Network:</label>
-    <select id="network" required>
-      <option value="mtn">MTN</option>
-      <option value="airtel">Airtel</option>
-      <option value="glo">Glo</option>
-      <option value="etisalat">9mobile</option>
-    </select>
-
-    <label for="amount">Amount (₦):</label>
-    <input type="number" id="amount" placeholder="e.g. 200" required>
-
-    <button type="submit">Send Airtime</button>
-  </form>
-
-  <p id="responseMsg"></p>
-
-  <script>
+  </form>  <p id="responseMsg"></p>  <script>
     const form = document.getElementById('airtimeForm');
     const msg = document.getElementById('responseMsg');
 
@@ -65,7 +38,8 @@
       const network = document.getElementById('network').value;
       const amount = document.getElementById('amount').value;
 
-      const request_id = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12) + Math.floor(Math.random() * 1000);
+      const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 12);
+      const request_id = `${timestamp}_profpay${Math.floor(Math.random() * 1000)}`;
 
       const payload = {
         request_id,
@@ -75,31 +49,28 @@
       };
 
       try {
-        const response = await fetch('https://sandbox.vtpass.com/api/pay', {
+        const res = await fetch('https://sandbox.vtpass.com/api/pay', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'api-key': '6e42765736a76d61f25b1073866f2947',
-            'Authorization': 'Basic ' + btoa('PK_83813c6cea21721948ec5bffd2abb6c9ff3860bb0f7:SK_26764a7c8af0b214739c133b82df2b5746ffc436a65')
+            'Authorization': 'Basic UEtfODM4MTNjNmNlYTIxNzIxOTQ4ZWM1YmZmZDJhYmI2YzlmZjM4NjBiYjBmNzpTS18yNjc2NGE3YzhhZjBiMjE0NzM5YzEzM2I4MmRmMmI1NzQ2ZmZjNDM2YTY1'
           },
           body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
+        const data = await res.json();
         console.log(data);
 
         if (data.code === '000') {
           msg.textContent = `✅ Airtime sent to ${phone} on ${network.toUpperCase()} - ₦${amount}`;
         } else {
-          msg.textContent = `❌ Error: ${data.response_description || 'Unknown error'}`;
+          msg.textContent = `❌ Error: ${data.response_description || data.message || 'Unknown error'}`;
         }
-
       } catch (err) {
-        console.error(err);
-        msg.textContent = '❌ Network error, please try again.';
+        console.error('Fetch Error:', err);
+        msg.textContent = '❌ Network or server error. Please try again.';
       }
     });
-  </script>
-
-</body>
+  </script></body>
 </html>
