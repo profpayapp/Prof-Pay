@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prof-Pay Wallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+  <!-- Header -->
+  <div class="bg-blue-800 text-white p-4 text-center text-xl font-bold">
+    Prof-Pay Wallet Dashboard
+  </div>
+
+  <!-- Wallet Summary -->
+  <div class="p-4">
+    <div class="bg-white rounded-2xl shadow p-4">
+      <h2 class="text-lg font-semibold mb-2">Your Wallet Balances</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-blue-50 p-3 rounded-xl shadow">
+          <h3 class="font-bold text-sm">Fiat Wallet (₦)</h3>
+          <p class="text-xl font-semibold text-blue-700">₦12,000.00</p>
+        </div>
+        <div class="bg-yellow-50 p-3 rounded-xl shadow">
+          <h3 class="font-bold text-sm">TACC Wallet (Crypto)</h3>
+          <p class="text-xl font-semibold text-yellow-700">1,200 TACC</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Actions -->
+  <div class="p-4">
+    <div class="grid grid-cols-2 gap-4 text-center">
+      <button class="bg-blue-600 text-white rounded-xl py-3 shadow">Send</button>
+      <button class="bg-green-600 text-white rounded-xl py-3 shadow">Receive</button>
+      <button class="bg-indigo-600 text-white rounded-xl py-3 shadow">Buy</button>
+      <button class="bg-purple-600 text-white rounded-xl py-3 shadow">Swap</button>
+    </div>
+  </div>
+
+  <!-- Transaction History -->
+  <div class="p-4">
+    <div class="bg-white rounded-2xl shadow p-4">
+      <h2 class="text-lg font-semibold mb-2">Recent Transactions</h2>
+      <ul class="text-sm space-y-2">
+        <li class="border-b pb-2">
+          ✅ Received 0.5 TACC from Wallet `0x98...203f` - <span class="text-green-600">+0.5 TACC</span>
+        </li>
+        <li class="border-b pb-2">
+          🔄 Swapped ₦1000 for 10 TACC - <span class="text-purple-600">Swap</span>
+        </li>
+        <li class="pb-2">
+          ❌ Sent ₦500 to Airtime - <span class="text-red-600">-₦500</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>
