@@ -2,61 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prof-Pay Wallet</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+<body class="bg-gray-100 text-gray-800">
 
-  <!-- Header -->
-  <div class="bg-blue-800 text-white p-4 text-center text-xl font-bold">
-    Prof-Pay Wallet Dashboard
-  </div>
+  <div class="max-w-2xl mx-auto p-6 mt-10 bg-white rounded-2xl shadow">
+    <h1 class="text-2xl font-bold mb-4 text-center">Welcome to Prof-Pay Wallet</h1>
 
-  <!-- Wallet Summary -->
-  <div class="p-4">
-    <div class="bg-white rounded-2xl shadow p-4">
-      <h2 class="text-lg font-semibold mb-2">Your Wallet Balances</h2>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="bg-blue-50 p-3 rounded-xl shadow">
-          <h3 class="font-bold text-sm">Fiat Wallet (₦)</h3>
-          <p class="text-xl font-semibold text-blue-700">₦12,000.00</p>
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">Wallet Balance</h2>
+      <div class="bg-gray-100 p-4 rounded-xl text-lg font-mono">
+        ₦0.00 (Coming Soon from Smart Blockchain Logic)
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">Wallet Addresses</h2>
+
+      <div class="mb-4">
+        <label class="font-medium">TACC Wallet:</label>
+        <div class="flex items-center bg-gray-100 p-2 rounded-xl">
+          <input id="taccWallet" type="text" value="0x142B679A6b23B4720d81CE4beD9f4dAfE9803066" readonly class="bg-transparent w-full mr-2" />
+          <button onclick="copyToClipboard('taccWallet')" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Copy</button>
         </div>
-        <div class="bg-yellow-50 p-3 rounded-xl shadow">
-          <h3 class="font-bold text-sm">TACC Wallet (Crypto)</h3>
-          <p class="text-xl font-semibold text-yellow-700">1,200 TACC</p>
+      </div>
+
+      <div class="mb-4">
+        <label class="font-medium">BNB Wallet:</label>
+        <div class="flex items-center bg-gray-100 p-2 rounded-xl">
+          <input id="bnbWallet" type="text" value="0x142B679A6b23B4720d81CE4beD9f4dAfE9803066" readonly class="bg-transparent w-full mr-2" />
+          <button onclick="copyToClipboard('bnbWallet')" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Copy</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="font-medium">USDT (BEP20):</label>
+        <div class="flex items-center bg-gray-100 p-2 rounded-xl">
+          <input id="usdtWallet" type="text" value="0x142B679A6b23B4720d81CE4beD9f4dAfE9803066" readonly class="bg-transparent w-full mr-2" />
+          <button onclick="copyToClipboard('usdtWallet')" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Copy</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Wallet Actions -->
-  <div class="p-4">
-    <div class="grid grid-cols-2 gap-4 text-center">
-      <button class="bg-blue-600 text-white rounded-xl py-3 shadow">Send</button>
-      <button class="bg-green-600 text-white rounded-xl py-3 shadow">Receive</button>
-      <button class="bg-indigo-600 text-white rounded-xl py-3 shadow">Buy</button>
-      <button class="bg-purple-600 text-white rounded-xl py-3 shadow">Swap</button>
-    </div>
-  </div>
-
-  <!-- Transaction History -->
-  <div class="p-4">
-    <div class="bg-white rounded-2xl shadow p-4">
-      <h2 class="text-lg font-semibold mb-2">Recent Transactions</h2>
-      <ul class="text-sm space-y-2">
-        <li class="border-b pb-2">
-          ✅ Received 0.5 TACC from Wallet `0x98...203f` - <span class="text-green-600">+0.5 TACC</span>
-        </li>
-        <li class="border-b pb-2">
-          🔄 Swapped ₦1000 for 10 TACC - <span class="text-purple-600">Swap</span>
-        </li>
-        <li class="pb-2">
-          ❌ Sent ₦500 to Airtime - <span class="text-red-600">-₦500</span>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <script>
+    function copyToClipboard(id) {
+      const input = document.getElementById(id);
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Copied: " + input.value);
+    }
+  </script>
 
 </body>
 </html>
