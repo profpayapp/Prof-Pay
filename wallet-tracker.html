@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prof-Pay Wallet Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-3xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-center text-blue-700 mb-6">Prof-Pay Wallet Tracker</h1><div class="bg-white p-6 rounded-xl shadow">
+  <h2 class="text-xl font-semibold text-gray-800 mb-2">Wallet Address:</h2>
+  <p class="text-sm font-mono text-blue-700 break-all">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow mt-6">
+  <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Transactions (BNB / TACC / USDT)</h2>
+  <ul id="tx-list" class="space-y-4 text-sm text-gray-700 font-mono">
+    <li>Loading transactions...</li>
+  </ul>
+</div>
+
+  </div>  <script>
+    const apiKey = "Your_BscScan_API_Key_Here"; // Optional: for heavier usage
+    const address = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+    const txList = document.getElementById("tx-list");
+
+    async function fetchTransactions() {
+      try {
+        const url = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.status === "1") {
+          txList.innerHTML = "";
+          data.result.forEach(tx => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+              🔁 TxHash: <a href="https://bscscan.com/tx/${tx.hash}" class="text-blue-600 underline" target="_blank">${tx.hash.slice(0, 12)}...</a><br>
+              🔸 From: ${tx.from.slice(0, 12)}... → To: ${tx.to.slice(0, 12)}...<br>
+              💰 Amount: ${parseFloat(tx.value / 1e18).toFixed(4)} BNB
+              <hr class="my-2">
+            `;
+            txList.appendChild(li);
+          });
+        } else {
+          txList.innerHTML = "<li class='text-red-500'>No transactions found or API limit reached.</li>";
+        }
+      } catch (err) {
+        txList.innerHTML = `<li class='text-red-500'>Error loading transactions</li>`;
+        console.error(err);
+      }
+    }
+
+    fetchTransactions();
+  </script></body>
+</html>
