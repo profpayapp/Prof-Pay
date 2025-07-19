@@ -1,56 +1,91 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prof-Pay Wallet Tracker</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
-  <div class="max-w-3xl mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold text-center text-blue-700 mb-6">Prof-Pay Wallet Tracker</h1><div class="bg-white p-6 rounded-xl shadow">
-  <h2 class="text-xl font-semibold text-gray-800 mb-2">Wallet Address:</h2>
-  <p class="text-sm font-mono text-blue-700 break-all">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+  <div class="max-w-2xl mx-auto p-6">
+    <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">Prof-Pay Wallet Tracker</h1><div class="bg-white rounded-2xl shadow p-4 mb-6">
+  <h2 class="text-lg font-semibold mb-2">Wallet Address</h2>
+  <p id="walletAddress" class="text-sm break-all">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+  <button onclick="copyWallet()" class="mt-2 text-blue-600 underline">Copy</button>
 </div>
 
-<div class="bg-white p-6 rounded-xl shadow mt-6">
-  <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Transactions (BNB / TACC / USDT)</h2>
-  <ul id="tx-list" class="space-y-4 text-sm text-gray-700 font-mono">
-    <li>Loading transactions...</li>
+<div class="bg-white rounded-2xl shadow p-4 mb-6">
+  <h2 class="text-lg font-semibold mb-2">Wallet Balances (BSC)</h2>
+  <ul class="text-gray-700 space-y-2">
+    <li>BNB: <span id="bnbBalance">Loading...</span></li>
+    <li>TACC: <span id="taccBalance">Loading...</span></li>
+    <li>USDT (BEP20): <span id="usdtBalance">Loading...</span></li>
   </ul>
 </div>
 
-  </div>  <script>
-    const apiKey = "Your_BscScan_API_Key_Here"; // Optional: for heavier usage
-    const address = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const txList = document.getElementById("tx-list");
+<div class="bg-white rounded-2xl shadow p-4">
+  <h2 class="text-lg font-semibold mb-2">Recent Transactions</h2>
+  <p id="txHistory" class="text-sm text-gray-600">Loading transactions...</p>
+</div>
 
-    async function fetchTransactions() {
-      try {
-        const url = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc`;
-        const res = await fetch(url);
-        const data = await res.json();
+  </div><script>
+const wallet = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+const taccContract = "0xb021a0e505ecfe41dcb497b70fb123430e30d94d";
+const usdtContract = "0x55d398326f99059fF775485246999027B3197955"; // Standard USDT BEP20
+const bscApi = "https://api.bscscan.com/api";
+const apiKey = "Your_BscScan_API_Key_Here"; // Optional
 
-        if (data.status === "1") {
-          txList.innerHTML = "";
-          data.result.forEach(tx => {
-            const li = document.createElement("li");
-            li.innerHTML = `
-              🔁 TxHash: <a href="https://bscscan.com/tx/${tx.hash}" class="text-blue-600 underline" target="_blank">${tx.hash.slice(0, 12)}...</a><br>
-              🔸 From: ${tx.from.slice(0, 12)}... → To: ${tx.to.slice(0, 12)}...<br>
-              💰 Amount: ${parseFloat(tx.value / 1e18).toFixed(4)} BNB
-              <hr class="my-2">
-            `;
-            txList.appendChild(li);
-          });
-        } else {
-          txList.innerHTML = "<li class='text-red-500'>No transactions found or API limit reached.</li>";
-        }
-      } catch (err) {
-        txList.innerHTML = `<li class='text-red-500'>Error loading transactions</li>`;
-        console.error(err);
-      }
+function copyWallet() {
+  navigator.clipboard.writeText(wallet).then(() => alert("Wallet address copied!"));
+}
+
+async function fetchBalance(contract, decimals = 18) {
+  const url = `${bscApi}?module=account&action=tokenbalance&contractaddress=${contract}&address=${wallet}&tag=latest&apikey=${apiKey}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return parseFloat(data.result) / (10 ** decimals);
+}
+
+async function fetchBNBBalance() {
+  const url = `${bscApi}?module=account&action=balance&address=${wallet}&tag=latest&apikey=${apiKey}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return parseFloat(data.result) / (10 ** 18);
+}
+
+async function loadBalances() {
+  try {
+    document.getElementById('bnbBalance').textContent = (await fetchBNBBalance()).toFixed(4);
+    document.getElementById('taccBalance').textContent = (await fetchBalance(taccContract)).toFixed(2);
+    document.getElementById('usdtBalance').textContent = (await fetchBalance(usdtContract, 18)).toFixed(2);
+  } catch (err) {
+    document.getElementById('bnbBalance').textContent = "Error";
+    document.getElementById('taccBalance').textContent = "Error";
+    document.getElementById('usdtBalance').textContent = "Error";
+    console.error(err);
+  }
+}
+
+async function loadTransactions() {
+  try {
+    const res = await fetch(`${bscApi}?module=account&action=txlist&address=${wallet}&sort=desc&apikey=${apiKey}`);
+    const data = await res.json();
+    const txs = data.result.slice(0, 5);
+    if (txs.length === 0) {
+      document.getElementById('txHistory').textContent = "No transactions found.";
+    } else {
+      document.getElementById('txHistory').innerHTML = txs.map(tx => `
+        <div class="mb-2">
+          <div class="text-sm">Hash: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank" class="text-blue-600 underline">${tx.hash.slice(0, 12)}...</a></div>
+          <div class="text-xs text-gray-500">Block: ${tx.blockNumber} - ${tx.timeStamp}</div>
+        </div>`).join("");
     }
+  } catch (err) {
+    document.getElementById('txHistory').textContent = "Error loading transactions.";
+    console.error(err);
+  }
+}
 
-    fetchTransactions();
-  </script></body>
+loadBalances();
+loadTransactions();
+</script></body>
 </html>
