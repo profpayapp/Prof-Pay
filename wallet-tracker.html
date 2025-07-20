@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prof-Pay Wallet Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8fafc;
+      padding: 2rem;
+      color: #333;
+    }
+    .tracker {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h2 { color: #2563eb; margin-bottom: 1rem; }
+    .balance, .transactions {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .label {
+      font-weight: bold;
+    }
+    code {
+      background: #e2e8f0;
+      padding: 0.2rem 0.4rem;
+      border-radius: 5px;
+      display: inline-block;
+      margin: 0.3rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="tracker">
+    <h2>Prof-Pay Wallet Tracker</h2>
+    <p><span class="label">Wallet Address:</span><br>
+      <code id="wallet">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code>
+    </p>
+
+    <div class="balance">
+      <p><strong>Wallet Balances (Live from BSC):</strong></p>
+      <p>BNB: <span id="bnb">Loading...</span></p>
+    </div>
+
+    <div class="transactions">
+      <p><strong>Recent Transactions</strong></p>
+      <div id="txns">Loading...</div>
+    </div>
+  </div>
+
+  <script>
+    const walletAddress = document.getElementById('wallet').textContent;
+    const apiKey = '8PDG3RT16Y8T4N76X4IFT7HKH3YUCP7XDG';
+
+    async function loadWalletData() {
+      try {
+        // BNB Balance
+        const balRes = await fetch(`https://api.bscscan.com/api?module=account&action=balance&address=${walletAddress}&apikey=${apiKey}`);
+        const balData = await balRes.json();
+        const bnb = (parseFloat(balData.result) / 1e18).toFixed(6);
+        document.getElementById('bnb').textContent = bnb + ' BNB';
+      } catch (e) {
+        document.getElementById('bnb').textContent = 'Error fetching';
+      }
+
+      try {
+        // Recent Transactions
+        const txRes = await fetch(`https://api.bscscan.com/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc&apikey=${apiKey}`);
+        const txData = await txRes.json();
+        const txnsDiv = document.getElementById('txns');
+        txnsDiv.innerHTML = '';
+        if (txData.status === '1') {
+          txData.result.forEach(tx => {
+            const hash = tx.hash;
+            const value = (tx.value / 1e18).toFixed(5);
+            const to = tx.to;
+            const time = new Date(tx.timeStamp * 1000).toLocaleString();
+            const html = `<p><strong>${value} BNB</strong> to ${to}<br><small>${time}</small></p>`;
+            txnsDiv.innerHTML += html;
+          });
+        } else {
+          txnsDiv.textContent = 'No recent transactions found.';
+        }
+      } catch (e) {
+        document.getElementById('txns').textContent = 'Error loading transactions.';
+      }
+    }
+
+    loadWalletData();
+  </script>
+</body>
+</html>
