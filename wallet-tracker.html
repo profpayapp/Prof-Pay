@@ -6,50 +6,78 @@
   <title>Prof-Pay Wallet Tracker</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-2xl mx-auto p-6 bg-white shadow-lg mt-10 rounded-2xl">
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">Prof-Pay Wallet Tracker</h1>
 
-  <div class="max-w-2xl mx-auto p-6 bg-white mt-10 rounded-xl shadow-lg">
-    <h1 class="text-2xl font-bold mb-4 text-center">Prof-Pay Wallet Tracker</h1>
-
-    <div class="mb-6">
-      <label class="block font-semibold mb-1">Wallet Address:</label>
-      <div class="bg-gray-100 p-2 rounded text-sm break-all" id="walletAddress">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Wallet Address:</label>
+    <div class="flex items-center bg-gray-100 p-2 rounded mb-4">
+      <input type="text" id="walletAddress" value="0x142B679A6b23B4720d81CE4beD9f4dAfE9803066" readonly class="flex-1 bg-transparent outline-none text-sm"/>
+      <button onclick="copyAddress()" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded text-xs">Copy</button>
     </div>
 
-    <div class="mb-6">
-      <h2 class="text-lg font-semibold mb-2">Wallet Balances (Live from BSC):</h2>
-      <p id="bnbBalance">BNB: Loading...</p>
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-800">Wallet Balances (Live from BSC)</h2>
+      <p class="text-sm mt-1">BNB: <span id="bnbBalance" class="font-bold text-blue-600">Loading...</span></p>
     </div>
 
-    <div>
-      <h2 class="text-lg font-semibold mb-2">Recent Transactions</h2>
-      <div id="txList" class="text-sm text-gray-600">Coming soon...</div>
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-1">Recent Transactions</h2>
+      <div id="txnList" class="text-sm text-gray-600">Loading...</div>
     </div>
   </div>
 
   <script>
-    const apiKey = "YOUR_NEW_API_KEY_HERE";
-    const address = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const bnbBalanceEl = document.getElementById("bnbBalance");
+    const apiKey = "8PDG3RT16Y8T4N76X4IFT7HKH3YUCP7XDG";
+    const wallet = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
 
-    async function getBNBBalance() {
+    function copyAddress() {
+      navigator.clipboard.writeText(wallet);
+      alert("Wallet address copied!");
+    }
+
+    async function fetchBalance() {
+      const url = `https://api.bscscan.com/api?module=account&action=balance&address=${wallet}&apikey=${apiKey}`;
       try {
-        const res = await fetch(`https://api.bscscan.com/api?module=account&action=balance&address=${address}&apikey=${apiKey}`);
+        const res = await fetch(url);
         const data = await res.json();
         if (data.status === "1") {
-          const balanceInBNB = parseFloat(data.result) / 1e18;
-          bnbBalanceEl.textContent = `BNB: ${balanceInBNB.toFixed(6)} BNB`;
+          const bnb = parseFloat(data.result) / 1e18;
+          document.getElementById("bnbBalance").textContent = `${bnb.toFixed(6)} BNB`;
         } else {
-          bnbBalanceEl.textContent = `BNB: Error - ${data.message}`;
+          document.getElementById("bnbBalance").textContent = "Error fetching balance";
         }
-      } catch (error) {
-        bnbBalanceEl.textContent = "BNB: Error fetching balance.";
-        console.error(error);
+      } catch (err) {
+        document.getElementById("bnbBalance").textContent = "Error fetching balance";
       }
     }
 
-    getBNBBalance();
-  </script>
+    async function fetchTransactions() {
+      const url = `https://api.bscscan.com/api?module=account&action=txlist&address=${wallet}&sort=desc&apikey=${apiKey}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.status === "1") {
+          const txns = data.result.slice(0, 5);
+          const container = document.getElementById("txnList");
+          container.innerHTML = txns.map(txn => {
+            return `<div class="mb-2 border-b pb-1">
+              <div><strong>Hash:</strong> ${txn.hash.slice(0, 10)}... <a href="https://bscscan.com/tx/${txn.hash}" target="_blank" class="text-blue-500 text-xs">View</a></div>
+              <div><strong>From:</strong> ${txn.from.slice(0, 10)}...</div>
+              <div><strong>To:</strong> ${txn.to.slice(0, 10)}...</div>
+              <div><strong>Value:</strong> ${parseFloat(txn.value)/1e18} BNB</div>
+            </div>`;
+          }).join('');
+        } else {
+          document.getElementById("txnList").textContent = "No recent transactions found.";
+        }
+      } catch (err) {
+        document.getElementById("txnList").textContent = "Error loading transactions.";
+      }
+    }
 
+    fetchBalance();
+    fetchTransactions();
+  </script>
 </body>
 </html>
