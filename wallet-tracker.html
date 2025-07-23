@@ -7,104 +7,81 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f8f9fa;
       padding: 20px;
+      background-color: #f7f7f7;
     }
-    .card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      max-width: 600px;
-      margin: auto;
-    }
-    h2 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-    .value {
-      font-weight: bold;
-      color: #007bff;
+    h1 {
+      color: #1a202c;
     }
     .section {
       margin-bottom: 20px;
-    }
-    .transactions {
-      background: #f1f1f1;
-      padding: 10px;
+      background: white;
+      padding: 15px;
       border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
     }
-    .tx {
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed #ccc;
+    .label {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>🔐 Prof-Pay Wallet Tracker</h2>
-    <div class="section">
-      <strong>Wallet Address:</strong>
-      <div class="value" id="wallet">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</div>
-    </div>
-    <div class="section">
-      <strong>Wallet Balances (Live from BSC):</strong>
-      <div>BNB: <span class="value" id="bnbBalance">Loading...</span></div>
-      <div>TACC / USDT: <span class="value">Coming soon...</span></div>
-    </div>
-    <div class="section">
-      <strong>Recent Transactions:</strong>
-      <div class="transactions" id="txList">Loading...</div>
-    </div>
+  <h1>🔍 Prof-Pay Wallet Tracker</h1>
+
+  <div class="section">
+    <p><span class="label">Wallet Address:</span> 0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
+  </div>
+
+  <div class="section">
+    <h3>📊 Wallet Balances (Live from BSC):</h3>
+    <p><strong>BNB:</strong> <span id="bnbBalance">Loading...</span></p>
+    <p><strong>TACC / USDT:</strong> Coming soon...</p>
+  </div>
+
+  <div class="section">
+    <h3>📜 Recent Transactions:</h3>
+    <ul id="txList">
+      <li>Loading...</li>
+    </ul>
   </div>
 
   <script>
-    const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const apiKey = "IU3K13NRGVPIUQ3RKCCVM9GSENVTV49HW3";
+    const wallet = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+    const apiKey = "8YHXR4DV8QWVVP27HPHNIC8A78TMSB9QPU";
 
-    // Get BNB Balance
-    fetch(`https://api.bscscan.com/api?module=account&action=balance&address=${walletAddress}&apikey=${apiKey}`)
+    // Fetch BNB balance
+    fetch(`https://api.bscscan.com/api?module=account&action=balance&address=${wallet}&tag=latest&apikey=${apiKey}`)
       .then(res => res.json())
       .then(data => {
         if (data.status === "1") {
-          const bnb = parseFloat(data.result) / 1e18;
-          document.getElementById("bnbBalance").innerText = bnb.toFixed(4) + " BNB";
+          const bnb = (parseFloat(data.result) / 1e18).toFixed(6);
+          document.getElementById("bnbBalance").textContent = `${bnb} BNB`;
         } else {
-          document.getElementById("bnbBalance").innerText = "Error fetching balance";
+          document.getElementById("bnbBalance").textContent = "Error fetching balance";
         }
       })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("bnbBalance").innerText = "Error";
+      .catch(() => {
+        document.getElementById("bnbBalance").textContent = "Network error";
       });
 
-    // Get Recent Transactions
-    fetch(`https://api.bscscan.com/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc&apikey=${apiKey}`)
+    // Fetch recent transactions
+    fetch(`https://api.bscscan.com/api?module=account&action=txlist&address=${wallet}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc&apikey=${apiKey}`)
       .then(res => res.json())
       .then(data => {
         const txList = document.getElementById("txList");
+        txList.innerHTML = '';
         if (data.status === "1") {
-          txList.innerHTML = "";
           data.result.forEach(tx => {
-            const amount = parseFloat(tx.value) / 1e18;
-            const time = new Date(tx.timeStamp * 1000).toLocaleString();
-            const direction = tx.to.toLowerCase() === walletAddress.toLowerCase() ? "IN" : "OUT";
-            txList.innerHTML += `
-              <div class="tx">
-                <strong>${direction}</strong> - ${amount.toFixed(4)} BNB<br/>
-                <small>${time}</small><br/>
-                <a href="https://bscscan.com/tx/${tx.hash}" target="_blank">View TX</a>
-              </div>
-            `;
+            const li = document.createElement("li");
+            li.innerHTML = `Txn Hash: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank">${tx.hash.slice(0, 12)}...</a> | Block: ${tx.blockNumber}`;
+            txList.appendChild(li);
           });
         } else {
-          txList.innerText = "No recent transactions found.";
+          txList.innerHTML = "<li>No recent transactions found.</li>";
         }
       })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("txList").innerText = "Error loading transactions.";
+      .catch(() => {
+        document.getElementById("txList").innerHTML = "<li>Error fetching transactions.</li>";
       });
   </script>
 </body>
