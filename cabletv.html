@@ -1,98 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Prof-Pay - Cable TV Subscription</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      max-width: 600px;
-      margin: auto;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      color: #2e86de;
-    }
-    label {
-      margin-top: 15px;
-      display: block;
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      background-color: #2e86de;
-      color: #fff;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1b4f72;
-    }
-    .message {
-      margin-top: 20px;
-      padding: 12px;
-      background-color: #fff3cd;
-      border: 1px solid #ffeeba;
-      border-radius: 6px;
-      color: #856404;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Pay Cable TV Subscription (Sandbox)</h2>
-    <form id="tvForm">
-      <label for="tvType">TV Provider</label>
-      <select id="tvType" required>
-        <option value="">-- Select Provider --</option>
-        <option value="dstv">DStv</option>
-        <option value="gotv">GOtv</option>
-        <option value="startimes">Startimes</option>
-      </select>
+<!-- Cable TV Subscription Form -->
+<div class="cabletv-form" style="margin-top: 40px;">
+  <h2>Pay Cable TV Subscription (VTpass Sandbox)</h2>
 
-      <label for="smartcard">Smart Card Number</label>
-      <input type="text" id="smartcard" placeholder="Enter Smart Card Number" required />
+  <input type="text" id="tv-smartcard" placeholder="Enter Smartcard Number" />
 
-      <label for="amount">Amount (₦)</label>
-      <input type="number" id="amount" placeholder="Enter amount" required />
+  <select id="tv-provider">
+    <option value="dstv">DStv</option>
+    <option value="gotv">GOtv</option>
+    <option value="startimes">Startimes</option>
+  </select>
 
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" placeholder="Enter phone number" required />
+  <select id="tv-package">
+    <!-- Example DStv packages -->
+    <option value="dstv-padi">DStv Padi (₦2500)</option>
+    <option value="dstv-yanga">DStv Yanga (₦3500)</option>
+    <option value="gotv-jolli">GOtv Jolli (₦2800)</option>
+    <option value="startimes-smart">Startimes Smart (₦2400)</option>
+  </select>
 
-      <button type="submit">Proceed to Pay</button>
-    </form>
+  <input type="text" id="tv-phone" placeholder="Phone Number" />
 
-    <div id="message" class="message" style="display: none;">
-      ❌ Network error occurred.
-    </div>
-  </div>
+  <button onclick="payCableTV()">Pay TV Subscription</button>
 
-  <script>
-    document.getElementById("tvForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      document.getElementById("message").style.display = "block";
-      document.getElementById("message").innerText = "❌ Network error occurred.";
+  <div id="tv-response" style="margin-top:10px;"></div>
+</div>
+
+<script>
+  function payCableTV() {
+    const smartcard = document.getElementById("tv-smartcard").value;
+    const provider = document.getElementById("tv-provider").value;
+    const variation = document.getElementById("tv-package").value;
+    const phone = document.getElementById("tv-phone").value;
+    const requestId = "profpay_tv_" + Date.now();
+
+    const data = {
+      request_id: requestId,
+      serviceID: provider,
+      billersCode: smartcard,
+      variation_code: variation,
+      amount: "",  // VTpass determines from variation
+      phone: phone
+    };
+
+    const responseDiv = document.getElementById("tv-response");
+    responseDiv.innerHTML = "⏳ Processing TV payment...";
+
+    fetch("https://sandbox.vtpass.com/api/pay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": "sandbox",
+        "public-key": "sandbox@vtpass.com",
+        "secret-key": "sandbox"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+      console.log("TV Response:", response);
+      if (response.code === "000") {
+        responseDiv.innerHTML = `✅ Success! Subscription complete.`;
+      } else {
+        responseDiv.innerHTML = `❌ Failed: ${response.response_description}`;
+      }
+    })
+    .catch(err => {
+      console.error("VTpass TV Error:", err);
+      responseDiv.innerHTML = "❌ Error connecting to VTpass.";
     });
-  </script>
-</body>
-</html>
+  }
+</script>
