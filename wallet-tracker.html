@@ -1,88 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prof-Pay Wallet Tracker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
       padding: 20px;
-      background-color: #f7f7f7;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     h1 {
-      color: #1a202c;
+      color: #0a9396;
+      font-size: 24px;
     }
-    .section {
-      margin-bottom: 20px;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    .wallet-info, .balance, .transactions {
+      margin-top: 20px;
     }
     .label {
       font-weight: bold;
     }
+    code {
+      background: #eee;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
-  <h1>🔍 Prof-Pay Wallet Tracker</h1>
+  <div class="container">
+    <h1>Prof-Pay Wallet Tracker</h1><div class="wallet-info">
+  <p><span class="label">Wallet Address:</span> <code id="wallet">0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</code></p>
+</div>
 
-  <div class="section">
-    <p><span class="label">Wallet Address:</span> 0x142B679A6b23B4720d81CE4beD9f4dAfE9803066</p>
-  </div>
+<div class="balance">
+  <h3>Wallet Balances (Live from BSC):</h3>
+  <p>BNB: <span id="bnbBalance">Loading...</span></p>
+  <p>TACC / USDT: Coming soon...</p>
+</div>
 
-  <div class="section">
-    <h3>📊 Wallet Balances (Live from BSC):</h3>
-    <p><strong>BNB:</strong> <span id="bnbBalance">Loading...</span></p>
-    <p><strong>TACC / USDT:</strong> Coming soon...</p>
-  </div>
+<div class="transactions">
+  <h3>Recent Transactions:</h3>
+  <ul id="txnList">
+    <li>Loading...</li>
+  </ul>
+</div>
 
-  <div class="section">
-    <h3>📜 Recent Transactions:</h3>
-    <ul id="txList">
-      <li>Loading...</li>
-    </ul>
-  </div>
+  </div>  <script>
+    const apiKey = "IU3K13NRGVPIUQ3RKCCVM9GSENVTV49HW3";
+    const walletAddress = document.getElementById("wallet").textContent;
+    const bnbBalanceEl = document.getElementById("bnbBalance");
+    const txnList = document.getElementById("txnList");
 
-  <script>
-    const wallet = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const apiKey = "8YHXR4DV8QWVVP27HPHNIC8A78TMSB9QPU";
-
-    // Fetch BNB balance
-    fetch(`https://api.bscscan.com/api?module=account&action=balance&address=${wallet}&tag=latest&apikey=${apiKey}`)
-      .then(res => res.json())
-      .then(data => {
+    async function getBNBBalance() {
+      try {
+        const url = `https://api.bscscan.com/api?module=account&action=balance&address=${walletAddress}&apikey=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
         if (data.status === "1") {
-          const bnb = (parseFloat(data.result) / 1e18).toFixed(6);
-          document.getElementById("bnbBalance").textContent = `${bnb} BNB`;
+          const balanceInBNB = parseFloat(data.result) / 1e18;
+          bnbBalanceEl.textContent = balanceInBNB.toFixed(5) + " BNB";
         } else {
-          document.getElementById("bnbBalance").textContent = "Error fetching balance";
+          bnbBalanceEl.textContent = "Error: " + data.result;
         }
-      })
-      .catch(() => {
-        document.getElementById("bnbBalance").textContent = "Network error";
-      });
+      } catch (error) {
+        bnbBalanceEl.textContent = "Error fetching balance";
+      }
+    }
 
-    // Fetch recent transactions
-    fetch(`https://api.bscscan.com/api?module=account&action=txlist&address=${wallet}&startblock=0&endblock=99999999&page=1&offset=5&sort=desc&apikey=${apiKey}`)
-      .then(res => res.json())
-      .then(data => {
-        const txList = document.getElementById("txList");
-        txList.innerHTML = '';
+    async function getTransactions() {
+      try {
+        const url = `https://api.bscscan.com/api?module=account&action=txlist&address=${walletAddress}&sort=desc&apikey=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        txnList.innerHTML = "";
         if (data.status === "1") {
-          data.result.forEach(tx => {
+          data.result.slice(0, 5).forEach(txn => {
             const li = document.createElement("li");
-            li.innerHTML = `Txn Hash: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank">${tx.hash.slice(0, 12)}...</a> | Block: ${tx.blockNumber}`;
-            txList.appendChild(li);
+            const amount = parseFloat(txn.value) / 1e18;
+            li.textContent = `Hash: ${txn.hash.slice(0, 10)}... | From: ${txn.from.slice(0, 6)}... | To: ${txn.to.slice(0, 6)}... | Amount: ${amount.toFixed(5)} BNB`;
+            txnList.appendChild(li);
           });
         } else {
-          txList.innerHTML = "<li>No recent transactions found.</li>";
+          txnList.innerHTML = `<li>No recent transactions found.</li>`;
         }
-      })
-      .catch(() => {
-        document.getElementById("txList").innerHTML = "<li>Error fetching transactions.</li>";
-      });
-  </script>
-</body>
+      } catch (error) {
+        txnList.innerHTML = `<li>Error fetching transactions</li>`;
+      }
+    }
+
+    getBNBBalance();
+    getTransactions();
+  </script></body>
 </html>
