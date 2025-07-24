@@ -1,54 +1,111 @@
-<!-- airtime.html with EmailJS integration --><!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Airtime Recharge | Prof-Pay</title>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    (function() {
-      emailjs.init("gebhXXueNgB9sqzoX");
-    })();
-  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prof-Pay Airtime | VTpass Sandbox</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    input, select, button { display: block; margin: 10px 0; padding: 8px; width: 100%; max-width: 400px; }
-    button { background-color: #00b894; color: white; border: none; cursor: pointer; }
-    button:hover { background-color: #019875; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f7f7f7;
+    }
+    .container {
+      max-width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    input, select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 16px;
+    }
+    #response {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
   </style>
 </head>
-<body>  <h2>Airtime Recharge</h2>
-  <form id="airtimeForm">
-    <input type="email" name="user_email" placeholder="Your Email" required>
-    <input type="tel" name="user_phone" placeholder="Phone Number" required>
-    <select name="network">
-      <option value="MTN">MTN</option>
-      <option value="GLO">GLO</option>
-      <option value="AIRTEL">AIRTEL</option>
-      <option value="9MOBILE">9MOBILE</option>
+<body>
+  <div class="container">
+    <h2>Buy Airtime (VTpass Sandbox)</h2>
+
+    <input type="text" id="airtime-phone" placeholder="Enter Phone Number" />
+
+    <input type="number" id="airtime-amount" placeholder="Amount (₦)" />
+
+    <select id="airtime-network">
+      <option value="mtn">MTN</option>
+      <option value="glo">GLO</option>
+      <option value="airtel">AIRTEL</option>
+      <option value="9mobile">9MOBILE</option>
     </select>
-    <input type="number" name="amount" placeholder="Amount (₦)" required><input type="hidden" name="payment_type" value="TACC">
-<input type="hidden" name="transaction_id" id="txn_id">
-<input type="hidden" name="crypto_wallet" value="0x142B679A6b23B4720d81CE4beD9f4dAfE9803066">
 
-<button type="submit">Proceed to Pay</button>
+    <button onclick="buyAirtime()">Send Airtime</button>
 
-  </form>  <script>
-    document.getElementById("airtimeForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+    <div id="response"></div>
+  </div>
 
-      const form = this;
-      const txnId = "TACC" + Date.now();
-      document.getElementById("txn_id").value = txnId;
+  <script>
+    function generateRequestID() {
+      return "profpay_airtime_" + Date.now();
+    }
 
-      emailjs.sendForm("service_yp78a8k", "template_ktt6pfl", form)
-        .then(() => {
-          alert("✅ Airtime payment simulated and email sent successfully!");
-          form.reset();
-        }, (error) => {
-          alert("❌ Failed to send email: " + error.text);
-        });
-    });
-  </script>  <footer>
-    <p>© 2025 Prof-Pay | Built on BSC Network</p>
-  </footer></body>
+    function buyAirtime() {
+      const phone = document.getElementById("airtime-phone").value.trim();
+      const amount = document.getElementById("airtime-amount").value.trim();
+      const network = document.getElementById("airtime-network").value;
+      const requestId = generateRequestID();
+      const responseDiv = document.getElementById("response");
+
+      if (!phone || !amount || !network) {
+        responseDiv.innerHTML = "❌ Please fill all fields.";
+        return;
+      }
+
+      const payload = {
+        request_id: requestId,
+        serviceID: "airtime",
+        billersCode: phone,
+        variation_code: network,
+        amount: amount,
+        phone: phone
+      };
+
+      responseDiv.innerHTML = "⏳ Processing airtime request...";
+
+      fetch("https://sandbox.vtpass.com/api/pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": "sandbox",
+          "public-key": "sandbox@vtpass.com",
+          "secret-key": "sandbox"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("VTpass Response:", data);
+        if (data.code === "000") {
+          responseDiv.innerHTML = `✅ Success! Airtime sent to ${phone}`;
+        } else {
+          responseDiv.innerHTML = `❌ Failed: ${data.response_description}`;
+        }
+      })
+      .catch(err => {
+        console.error("Airtime Error:", err);
+        responseDiv.innerHTML = "❌ Connection error to VTpass.";
+      });
+    }
+  </script>
+</body>
 </html>
