@@ -1,122 +1,64 @@
-<!DOCTYPE html><html>
-<head>
-  <title>Prof-Pay Utility</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
-    .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-    h2 { color: #2c3e50; }
-    label, input, select { display: block; width: 100%; margin-top: 10px; }
-    button { background: #3498db; color: #fff; padding: 10px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #2980b9; }
-  </style>
-</head>
-<body>
-  <h1>Prof-Pay Utility Services</h1>  <!-- Airtime -->  <div class="section">
-    <h2>Airtime Recharge</h2>
-    <input type="text" id="airtimePhone" placeholder="Enter Phone Number">
-    <select id="airtimeNetwork">
-      <option value="mtn">MTN</option>
-      <option value="glo">GLO</option>
-      <option value="airtel">AIRTEL</option>
-      <option value="etisalat">9MOBILE</option>
-    </select>
-    <input type="text" id="airtimeAmount" placeholder="Amount (e.g. 100)">
-    <button onclick="payAirtime()">Proceed to Pay</button>
-  </div>  <!-- Data -->  <div class="section">
-    <h2>Data Bundle</h2>
-    <input type="text" id="dataPhone" placeholder="Enter Phone Number">
-    <select id="dataNetwork">
-      <option value="mtn">MTN</option>
-      <option value="glo">GLO</option>
-      <option value="airtel">AIRTEL</option>
-      <option value="etisalat">9MOBILE</option>
-    </select>
-    <input type="text" id="dataAmount" placeholder="Amount (e.g. 500)">
-    <button onclick="payData()">Proceed to Pay</button>
-  </div>  <!-- Electricity -->  <div class="section">
-    <h2>Electricity Bill</h2>
-    <input type="text" id="meterNumber" placeholder="Enter Meter Number">
-    <select id="disco">
-      <option value="ikeja-electric">Ikeja Electric</option>
-      <option value="eko-electric">Eko Electric</option>
-      <option value="abuja-electric">Abuja Electric (AEDC)</option>
-    </select>
-    <input type="text" id="electricAmount" placeholder="Amount (e.g. 2000)">
-    <button onclick="payElectricity()">Proceed to Pay</button>
-  </div>  <!-- Cable TV -->  <div class="section">
-    <h2>Cable TV Subscription</h2>
-    <input type="text" id="tvSmartcard" placeholder="Enter Smartcard Number">
-    <select id="tvProvider">
-      <option value="gotv">GOtv</option>
-      <option value="dstv">DStv</option>
-      <option value="startimes">Startimes</option>
-    </select>
-    <input type="text" id="tvAmount" placeholder="Amount (e.g. 2500)">
-    <button onclick="payTV()">Proceed to Pay</button>
-  </div>  <script>
-    const username = "sandbox@vtpass.com";
-    const password = "sandbox";
+<!-- Airtime Form -->
+<div class="airtime-form">
+  <h2>Buy Airtime (VTpass Sandbox)</h2>
+  <input type="text" id="airtime-phone" placeholder="Enter Phone Number" />
+  <input type="number" id="airtime-amount" placeholder="Amount (₦)" />
+  <select id="airtime-network">
+    <option value="mtn">MTN</option>
+    <option value="glo">GLO</option>
+    <option value="airtel">AIRTEL</option>
+    <option value="9mobile">9MOBILE</option>
+  </select>
+  <button onclick="buyAirtime()">Send Airtime</button>
 
-    async function sendRequest(data) {
-      const response = await fetch("https://sandbox.vtpass.com/api/pay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Basic " + btoa(username + ":" + password)
-        },
-        body: JSON.stringify(data)
-      });
+  <div id="airtime-response" style="margin-top:10px;"></div>
+</div>
 
-      const result = await response.json();
-      alert("Response: " + JSON.stringify(result));
-    }
+<script>
+  function generateRequestID() {
+    return "profpay_" + Date.now();
+  }
 
-    function payAirtime() {
-      const data = {
-        request_id: Date.now().toString(),
-        serviceID: "airtime",
-        billersCode: document.getElementById("airtimePhone").value,
-        variation_code: document.getElementById("airtimeNetwork").value,
-        amount: document.getElementById("airtimeAmount").value,
-        phone: document.getElementById("airtimePhone").value
-      };
-      sendRequest(data);
-    }
+  function buyAirtime() {
+    const phone = document.getElementById("airtime-phone").value;
+    const amount = document.getElementById("airtime-amount").value;
+    const network = document.getElementById("airtime-network").value;
+    const requestId = generateRequestID();
 
-    function payData() {
-      const data = {
-        request_id: Date.now().toString(),
-        serviceID: "data",
-        billersCode: document.getElementById("dataPhone").value,
-        variation_code: document.getElementById("dataNetwork").value,
-        amount: document.getElementById("dataAmount").value,
-        phone: document.getElementById("dataPhone").value
-      };
-      sendRequest(data);
-    }
+    const data = {
+      request_id: requestId,
+      serviceID: "airtime",
+      billersCode: phone,
+      variation_code: network,
+      amount: amount,
+      phone: phone
+    };
 
-    function payElectricity() {
-      const data = {
-        request_id: Date.now().toString(),
-        serviceID: document.getElementById("disco").value,
-        billersCode: document.getElementById("meterNumber").value,
-        amount: document.getElementById("electricAmount").value,
-        phone: "07033708088" // your test phone
-      };
-      sendRequest(data);
-    }
+    const responseDiv = document.getElementById("airtime-response");
+    responseDiv.innerHTML = "⏳ Sending request...";
 
-    function payTV() {
-      const data = {
-        request_id: Date.now().toString(),
-        serviceID: document.getElementById("tvProvider").value,
-        billersCode: document.getElementById("tvSmartcard").value,
-        amount: document.getElementById("tvAmount").value,
-        phone: "07033708088"
-      };
-      sendRequest(data);
-    }
-  </script></body>
-</html>
+    fetch("https://sandbox.vtpass.com/api/pay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": "sandbox",
+        "public-key": "sandbox@vtpass.com",
+        "secret-key": "sandbox"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+      console.log("VTpass Response:", response);
+      if (response.code === "000") {
+        responseDiv.innerHTML = `✅ Success: ${response.content.transactions.transactionId}`;
+      } else {
+        responseDiv.innerHTML = `❌ Failed: ${response.response_description}`;
+      }
+    })
+    .catch(err => {
+      console.error("VTpass Error:", err);
+      responseDiv.innerHTML = "❌ Error connecting to VTpass.";
+    });
+  }
+</script>
