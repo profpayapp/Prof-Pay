@@ -1,65 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Buy Data - Prof-Pay</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h2>Buy Data (VTpass Sandbox)</h2>
-    <label>Phone Number:</label>
-    <input type="text" id="phone" placeholder="Enter your number" />
-    <label>Network:</label>
-    <select id="network">
-      <option value="mtn">MTN</option>
-      <option value="glo">GLO</option>
-      <option value="airtel">AIRTEL</option>
-      <option value="9mobile">9MOBILE</option>
-    </select>
-    <label>Amount:</label>
-    <input type="number" id="amount" placeholder="Amount" />
-    <button onclick="simulatePayment()">Proceed to Pay</button>
-    <div id="result"></div>
-  </div>
+<!-- Data Bundle Form -->
+<div class="data-form" style="margin-top: 40px;">
+  <h2>Buy Data Bundle (VTpass Sandbox)</h2>
+  <input type="text" id="data-phone" placeholder="Enter Phone Number" />
+  
+  <select id="data-network">
+    <option value="mtn-data">MTN</option>
+    <option value="glo-data">GLO</option>
+    <option value="airtel-data">AIRTEL</option>
+    <option value="9mobile-data">9MOBILE</option>
+  </select>
 
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    emailjs.init("gebhXXueNgB9sqzoX");
+  <select id="data-plan">
+    <!-- Example MTN plans -->
+    <option value="500">MTN - 500MB (₦100)</option>
+    <option value="1000">MTN - 1GB (₦200)</option>
+    <option value="2000">MTN - 2GB (₦500)</option>
+  </select>
 
-    function simulatePayment() {
-      const phone = document.getElementById("phone").value;
-      const network = document.getElementById("network").value;
-      const amount = document.getElementById("amount").value;
-      const userEmail = prompt("Enter your email for receipt:");
-      const userPhone = phone;
-      const transactionId = "TXN" + Date.now();
-      const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+  <button onclick="buyData()">Send Data</button>
 
-      if (!userEmail || !userPhone || !amount) {
-        alert("All fields are required.");
-        return;
+  <div id="data-response" style="margin-top:10px;"></div>
+</div>
+
+<script>
+  function buyData() {
+    const phone = document.getElementById("data-phone").value;
+    const network = document.getElementById("data-network").value;
+    const variation_code = document.getElementById("data-plan").value;
+    const requestId = "profpay_data_" + Date.now();
+
+    const data = {
+      request_id: requestId,
+      serviceID: network,
+      billersCode: phone,
+      variation_code: variation_code,
+      amount: "",  // Optional: VTpass will calculate based on plan
+      phone: phone
+    };
+
+    const responseDiv = document.getElementById("data-response");
+    responseDiv.innerHTML = "⏳ Processing data bundle request...";
+
+    fetch("https://sandbox.vtpass.com/api/pay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": "sandbox",
+        "public-key": "sandbox@vtpass.com",
+        "secret-key": "sandbox"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+      console.log("Data Response:", response);
+      if (response.code === "000") {
+        responseDiv.innerHTML = `✅ Success: ${response.content.transactions.transactionId}`;
+      } else {
+        responseDiv.innerHTML = `❌ Failed: ${response.response_description}`;
       }
-
-      document.getElementById("result").innerHTML =
-        "✅ Data purchase simulated for " +
-        phone +
-        " on " +
-        network.toUpperCase() +
-        " - ₦" +
-        amount;
-
-      // Send confirmation email
-      emailjs.send("service_yp78a8k", "template_ktt6pfl", {
-        user_email: userEmail,
-        user_phone: userPhone,
-        payment_type: "Data Bundle",
-        amount: amount,
-        transaction_id: transactionId,
-        crypto_wallet: walletAddress,
-      });
-    }
-  </script>
-</body>
-</html>
+    })
+    .catch(err => {
+      console.error("VTpass Data Error:", err);
+      responseDiv.innerHTML = "❌ Error connecting to VTpass.";
+    });
+  }
+</script>
