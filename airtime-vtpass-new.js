@@ -1,32 +1,36 @@
-document.getElementById('sendAirtimeBtn').addEventListener('click', function () {
-    const phone = document.getElementById('airtime-phone').value;
-    const amount = document.getElementById('airtime-amount').value;
-    const network = document.querySelector('input[name="airtime-network"]:checked').value;
+<script>
+document.getElementById("airtimeForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('phone', phone);
-    formData.append('amount', amount);
-    formData.append('network', network);
+    const phone = document.getElementById("phone").value;
+    const amount = document.getElementById("amount").value;
+    const network = document.getElementById("network").value;
+    const statusDiv = document.getElementById("status");
+    statusDiv.textContent = "⏳ Sending request...";
 
-    fetch('VTPass-airtime.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Log full response to browser console
-        console.log("VTpass API Response:", data);
+    try {
+        const formData = new FormData();
+        formData.append("phone", phone);
+        formData.append("amount", amount);
+        formData.append("network", network);
 
-        // Display response message
-        const resultBox = document.getElementById('airtime-result');
-        if (data.code === '000') {
-            resultBox.innerHTML = `<span style="color: green;">✅ Success: ${data.response_description}</span>`;
+        const response = await fetch("VTPass-airtime.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+            statusDiv.innerHTML = `❌ <strong>${result.error}</strong>`;
+        } else if (result.code === "000") {
+            statusDiv.innerHTML = `✅ Airtime Sent Successfully! <br>Transaction ID: ${result.requestId}`;
         } else {
-            resultBox.innerHTML = `<span style="color: red;">❌ Failed: ${data.response_description || data.message}</span>`;
+            statusDiv.innerHTML = `⚠️ ${result.response_description || "Transaction failed."}`;
         }
-    })
-    .catch(error => {
-        console.error("Fetch error:", error);
-        document.getElementById('airtime-result').innerHTML = `<span style="color: red;">❌ Request Failed</span>`;
-    });
+
+    } catch (err) {
+        statusDiv.innerHTML = `❌ Unexpected error: ${err.message}`;
+    }
 });
+</script>
