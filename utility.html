@@ -1,57 +1,153 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-  <title>Buy Airtime (VTpass Sandbox)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prof-Pay Utility Services</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f3f4f6, #ffffff);
+      color: #1f2937;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 1rem;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #1e293b;
+      padding: 0.5rem;
+      gap: 1rem;
+    }
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background-color: #3b82f6;
+      transition: background-color 0.3s ease;
+    }
+    nav a:hover {
+      background-color: #2563eb;
+    }
+    section {
+      display: none;
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+    }
+    section.active {
+      display: block;
+    }
+    h2 {
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #10b981;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #059669;
+    }
+  </style>
 </head>
 <body>
-  <h2>Buy Airtime (VTpass Sandbox)</h2>
-  <input type="text" id="phone" placeholder="Phone Number" /><br/><br/>
-  <input type="number" id="amount" placeholder="Amount" /><br/><br/>
-  <select id="network">
-    <option value="mtn">MTN</option>
-    <option value="glo">GLO</option>
-    <option value="airtel">AIRTEL</option>
-    <option value="etisalat">9Mobile</option>
-  </select><br/><br/>
-  <button onclick="buyAirtime()">Send Airtime</button>
-
-  <script>
-    function buyAirtime() {
-      const phone = document.getElementById('phone').value;
-      const amount = document.getElementById('amount').value;
-      const network = document.getElementById('network').value;
-
-      fetch("https://sandbox.vtpass.com/api/pay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "username": "sandbox@vtpass.com",
-          "password": "sandbox",
-        },
-        body: JSON.stringify({
-          serviceID: network,
-          billersCode: phone,
-          variation_code: "",
-          amount: amount,
-          phone: phone,
-          request_id: "airtime_" + Date.now(),
-        }),
-      })
-      .then(async (response) => {
-        let text = await response.text();
-        try {
-          let data = JSON.parse(text);
-          alert("✅ Success: " + data.response_description);
-        } catch (err) {
-          console.error("❌ Failed to parse JSON:", text);
-          alert("❌ Error: Invalid response from VTpass.\n\nRaw Response:\n" + text);
-        }
-      })
-      .catch((error) => {
-        console.error("❌ Fetch error:", error);
-        alert("❌ Network error. Could not reach VTpass.");
+  <header>
+    <h1>Prof-Pay Utility Services</h1>
+  </header>
+  <nav>
+    <a href="#airtime">Airtime</a>
+    <a href="#data">Data</a>
+    <a href="#electricity">Electricity</a>
+    <a href="#tv">TV</a>
+  </nav>  <section id="airtime">
+    <h2>Buy Airtime (VTpass Sandbox)</h2>
+    <label>Phone Number</label>
+    <input type="text" placeholder="Enter phone number" />
+    <label>Amount</label>
+    <input type="number" placeholder="Enter amount" />
+    <label>Network</label>
+    <select>
+      <option>MTN</option>
+      <option>Airtel</option>
+      <option>Glo</option>
+      <option>9mobile</option>
+    </select>
+    <button>Send Airtime</button>
+  </section>  <section id="data">
+    <h2>Buy Data Bundle</h2>
+    <label>Phone Number</label>
+    <input type="text" placeholder="Enter phone number" />
+    <label>Data Plan</label>
+    <select>
+      <option>MTN 1GB</option>
+      <option>MTN 2GB</option>
+      <option>Airtel 1.5GB</option>
+      <option>Glo 3GB</option>
+    </select>
+    <button>Buy Data</button>
+  </section>  <section id="electricity">
+    <h2>Pay Electricity Bill</h2>
+    <label>Meter Number</label>
+    <input type="text" placeholder="Enter meter number" />
+    <label>Disco</label>
+    <select>
+      <option>IKEDC</option>
+      <option>EKEDC</option>
+      <option>KEDCO</option>
+    </select>
+    <label>Amount</label>
+    <input type="number" placeholder="Enter amount" />
+    <button>Pay Electricity</button>
+  </section>  <section id="tv">
+    <h2>TV Subscription</h2>
+    <label>Smartcard Number</label>
+    <input type="text" placeholder="Enter smartcard number" />
+    <label>TV Provider</label>
+    <select>
+      <option>DSTV</option>
+      <option>GOTV</option>
+      <option>Startimes</option>
+    </select>
+    <label>Amount</label>
+    <input type="number" placeholder="Enter amount" />
+    <button>Subscribe</button>
+  </section>  <script>
+    function showSectionFromHash() {
+      const hash = location.hash.replace('#', '') || 'airtime';
+      document.querySelectorAll('section').forEach(section => {
+        section.classList.remove('active');
       });
+      const activeSection = document.getElementById(hash);
+      if (activeSection) activeSection.classList.add('active');
     }
-  </script>
-</body>
+
+    window.addEventListener('hashchange', showSectionFromHash);
+    window.addEventListener('load', showSectionFromHash);
+  </script></body>
 </html>
