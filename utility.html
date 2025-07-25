@@ -1,31 +1,57 @@
-fetch("https://sandbox.vtpass.com/api/pay", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "username": "sandbox@vtpass.com",
-    "password": "sandbox",
-  },
-  body: JSON.stringify({
-    serviceID: "mtn",
-    billersCode: phone,
-    variation_code: "",
-    amount: amount,
-    phone: phone,
-    request_id: "airtime_" + Date.now(),
-  }),
-})
-.then(async (response) => {
-  let text = await response.text();
-  try {
-    let data = JSON.parse(text);
-    console.log("Response data:", data);
-    alert("✅ Success: " + data.response_description);
-  } catch (err) {
-    console.error("❌ Failed to parse JSON:", text);
-    alert("❌ Error: Invalid response from VTpass.\n\nRaw Response:\n" + text);
-  }
-})
-.catch((error) => {
-  console.error("❌ Fetch error:", error);
-  alert("❌ Network error. Could not reach VTpass.");
-});
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buy Airtime (VTpass Sandbox)</title>
+</head>
+<body>
+  <h2>Buy Airtime (VTpass Sandbox)</h2>
+  <input type="text" id="phone" placeholder="Phone Number" /><br/><br/>
+  <input type="number" id="amount" placeholder="Amount" /><br/><br/>
+  <select id="network">
+    <option value="mtn">MTN</option>
+    <option value="glo">GLO</option>
+    <option value="airtel">AIRTEL</option>
+    <option value="etisalat">9Mobile</option>
+  </select><br/><br/>
+  <button onclick="buyAirtime()">Send Airtime</button>
+
+  <script>
+    function buyAirtime() {
+      const phone = document.getElementById('phone').value;
+      const amount = document.getElementById('amount').value;
+      const network = document.getElementById('network').value;
+
+      fetch("https://sandbox.vtpass.com/api/pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "username": "sandbox@vtpass.com",
+          "password": "sandbox",
+        },
+        body: JSON.stringify({
+          serviceID: network,
+          billersCode: phone,
+          variation_code: "",
+          amount: amount,
+          phone: phone,
+          request_id: "airtime_" + Date.now(),
+        }),
+      })
+      .then(async (response) => {
+        let text = await response.text();
+        try {
+          let data = JSON.parse(text);
+          alert("✅ Success: " + data.response_description);
+        } catch (err) {
+          console.error("❌ Failed to parse JSON:", text);
+          alert("❌ Error: Invalid response from VTpass.\n\nRaw Response:\n" + text);
+        }
+      })
+      .catch((error) => {
+        console.error("❌ Fetch error:", error);
+        alert("❌ Network error. Could not reach VTpass.");
+      });
+    }
+  </script>
+</body>
+</html>
