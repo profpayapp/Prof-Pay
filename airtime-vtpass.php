@@ -1,64 +1,41 @@
 <?php
-// Enable CORS for development (optional: remove or restrict in production)
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+header('Content-Type: application/json');
 
-// VTpass credentials (sandbox)
-$username = "sandbox@vtpass.com";
-$password = "sandbox";
-$host = "https://sandbox.vtpass.com/api/pay";
+$phone = $_POST['phone'];
+$amount = $_POST['amount'];
+$network = strtolower($_POST['network']); // Ensure it's lowercase
 
-// Collect input from JS fetch POST
-$phone = $_POST['phone'] ?? '';
-$amount = $_POST['amount'] ?? '';
-$network = $_POST['network'] ?? '';
-$request_id = uniqid("profpay_", true); // Unique ID for this request
+$curl = curl_init();
 
-// Basic validation
-if (!$phone || !$amount || !$network) {
-    echo json_encode(['error' => 'Missing required fields']);
-    exit;
-}
-
-// Prepare payload
-$data = [
-    'request_id' => $request_id,
-    'serviceID' => strtolower($network), // e.g. 'mtn'
-    'billersCode' => $phone,
-    'amount' => $amount,
-    'phone' => $phone
+$post_fields = [
+    "request_id" => uniqid(), // Unique ID for each request
+    "serviceID" => $network,  // 'mtn', 'glo', 'airtel', 'etisalat'
+    "amount" => $amount,
+    "phone" => $phone,
 ];
 
-// Initialize CURL
-$curl = curl_init();
-curl_setopt_array($curl, [
-    CURLOPT_URL => $host,
+curl_setopt_array($curl, array(
+    CURLOPT_URL => "https://sandbox.vtpass.com/api/pay",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_CUSTOMREQUEST => "POST",
-    CURLOPT_POSTFIELDS => json_encode($data),
-    CURLOPT_HTTPHEADER => [
+    CURLOPT_POSTFIELDS => json_encode($post_fields),
+    CURLOPT_HTTPHEADER => array(
         "Content-Type: application/json",
-        "Authorization: Basic " . base64_encode("$username:$password")
-    ]
-]);
+        "api-key: sandbox",             // VTPass Sandbox Key
+        "secret-key: sandbox",          // VTPass Sandbox Secret
+        "public-key: sandbox",          // VTPass Sandbox Public Key
+    ),
+));
 
-// Execute and capture response
 $response = curl_exec($curl);
 $error = curl_error($curl);
+
 curl_close($curl);
 
-// Log response for debugging
-$logData = "===== " . date("Y-m-d H:i:s") . " =====\n";
-$logData .= "Request ID: $request_id\n";
-$logData .= "Phone: $phone | Amount: $amount | Network: $network\n";
-$logData .= $response ?: "Curl Error: $error";
-$logData .= "\n\n";
-file_put_contents("vtpass_response_log.txt", $logData, FILE_APPEND);
-
-// Return to frontend
-if ($response === false) {
-    echo json_encode(['error' => "Connection error: $error"]);
+// Return detailed feedback
+if ($error) {
+    echo json_encode(["status" => "error", "message" => $error]);
 } else {
-    echo $response;
+    echo $response; // Send raw VTpass response
 }
 ?>
