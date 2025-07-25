@@ -1,41 +1,31 @@
-<!-- Airtime Test Form -->
-<h2>Buy Airtime (VTpass Sandbox)</h2>
-<input type="text" id="phone" value="08111111111" placeholder="Phone Number"><br>
-<input type="number" id="amount" value="100" placeholder="Amount"><br>
-<select id="network">
-  <option value="mtn">MTN</option>
-  <option value="glo">GLO</option>
-  <option value="airtel">AIRTEL</option>
-  <option value="9mobile">9MOBILE</option>
-</select><br>
-<button onclick="sendAirtime()">Send Airtime</button>
-
-<!-- Response Display Area -->
-<pre id="log" style="background:#000;color:#0f0;padding:10px;margin-top:15px;max-height:300px;overflow:auto;"></pre>
-
-<script>
-async function sendAirtime() {
-  const phone = document.getElementById('phone').value;
-  const amount = document.getElementById('amount').value;
-  const network = document.getElementById('network').value;
-
-  const log = document.getElementById('log');
-  log.textContent = "⏳ Sending request to VTpass...";
-
+fetch("https://sandbox.vtpass.com/api/pay", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "username": "sandbox@vtpass.com",
+    "password": "sandbox",
+  },
+  body: JSON.stringify({
+    serviceID: "mtn",
+    billersCode: phone,
+    variation_code: "",
+    amount: amount,
+    phone: phone,
+    request_id: "airtime_" + Date.now(),
+  }),
+})
+.then(async (response) => {
+  let text = await response.text();
   try {
-    const response = await fetch("vtpass-airtime.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ phone, amount, network }),
-    });
-
-    const result = await response.json();
-    log.textContent = "✅ VTpass Response:\n\n" + JSON.stringify(result, null, 2);
-
-  } catch (error) {
-    log.textContent = "❌ Error:\n\n" + error.message;
+    let data = JSON.parse(text);
+    console.log("Response data:", data);
+    alert("✅ Success: " + data.response_description);
+  } catch (err) {
+    console.error("❌ Failed to parse JSON:", text);
+    alert("❌ Error: Invalid response from VTpass.\n\nRaw Response:\n" + text);
   }
-}
-</script>
+})
+.catch((error) => {
+  console.error("❌ Fetch error:", error);
+  alert("❌ Network error. Could not reach VTpass.");
+});
