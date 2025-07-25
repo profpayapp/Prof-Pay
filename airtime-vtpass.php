@@ -1,56 +1,42 @@
 <?php
-// Only allow POST method
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Only POST method is allowed']);
-    exit;
-}
+header('Content-Type: application/json');
 
-// Get input from POST
-$phone = $_POST['phone'] ?? '';
-$amount = $_POST['amount'] ?? '';
-$network = $_POST['network'] ?? ''; // Example: 'mtn', 'glo', 'airtel', 'etisalat'
-
-// Basic validation
-if (empty($phone) || empty($amount) || empty($network)) {
-    echo json_encode(['error' => 'All fields are required']);
-    exit;
-}
+$phone = $_POST['phone'];
+$amount = $_POST['amount'];
+$network = $_POST['network'];
 
 // VTpass sandbox credentials
 $username = "sandbox@vtpass.com";
 $password = "sandbox";
+$serviceID = strtolower($network) . "_airtime";
 
-// Unique request ID (for testing you can randomize)
-$request_id = uniqid();
+$postdata = json_encode([
+    'serviceID' => $serviceID,
+    'billersCode' => $phone,
+    'variation_code' => '',
+    'amount' => $amount,
+    'phone' => $phone
+]);
 
-// VTpass API payload
-$payload = [
-    "request_id"    => $request_id,
-    "serviceID"     => $network,
-    "billersCode"   => $phone,
-    "variation_code"=> "",
-    "amount"        => $amount,
-    "phone"         => $phone
-];
+$curl = curl_init();
+curl_setopt_array($curl, [
+    CURLOPT_URL => "https://sandbox.vtpass.com/api/pay",
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => $postdata,
+    CURLOPT_HTTPHEADER => [
+        "Content-Type: application/json",
+        "Authorization: Basic " . base64_encode("$username:$password")
+    ]
+]);
 
-// Setup cURL
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://sandbox.vtpass.com/api/pay");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+$response = curl_exec($curl);
+$err = curl_error($curl);
+curl_close($curl);
 
-// Execute
-$response = curl_exec($ch);
-$error = curl_error($ch);
-curl_close($ch);
-
-// Handle result
-if ($error) {
-    echo json_encode(['error' => 'Connection error: ' . $error]);
+// Return full response to frontend
+if ($err) {
+    echo json_encode(['status' => 'error', 'message' => "Curl Error: $err"]);
 } else {
     echo $response;
 }
