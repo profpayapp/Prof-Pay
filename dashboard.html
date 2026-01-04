@@ -12,27 +12,35 @@
       margin: 0;
       padding: 2rem;
     }
+
     header {
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 2rem;
-      position: relative;
     }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+
     button.logout {
       background: #e74c3c;
       color: white;
       border: none;
-      padding: 0.7rem 1.2rem;
+      padding: 0.5rem 1rem;
       border-radius: 5px;
       cursor: pointer;
-      position: absolute;
-      right: 0;
-      top: 0;
+      font-size: 0.9rem;
     }
+
     .wallets {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
     }
+
     .wallet-card {
       background: white;
       padding: 1.5rem;
@@ -41,17 +49,21 @@
       text-align: center;
       transition: transform 0.2s;
     }
+
     .wallet-card:hover {
       transform: translateY(-5px);
     }
+
     .wallet-card img {
       width: 40px;
       height: 40px;
       margin-bottom: 0.5rem;
     }
+
     .wallet-card h2 {
       margin: 0.5rem 0;
     }
+
     .wallet-card p {
       font-size: 1.2rem;
       font-weight: bold;
@@ -59,6 +71,7 @@
   </style>
 </head>
 <body>
+
   <header>
     <h1>Welcome to Prof-Pay Dashboard</h1>
     <button class="logout" onclick="logout()">Logout</button>
@@ -67,7 +80,7 @@
   <section class="wallets">
     <!-- Pi Network Wallet -->
     <div class="wallet-card">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Pi_Network_Logo.png" alt="Pi Network Logo">
+      <img src="https://cryptologos.cc/logos/pi-network-pi-logo.png?v=025" alt="Pi Network Logo">
       <h2>Pi Network Wallet</h2>
       <p id="pi-balance">Loading...</p>
     </div>
@@ -94,11 +107,12 @@
     </div>
   </section>
 
-  <!-- Firebase Auth & Wallet Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut, getIdTokenResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAV4OESYVvV4uLYD2wxGY2fnxLYJoOzkC0",
       authDomain: "prof-prof.firebaseapp.com",
@@ -108,7 +122,17 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
+    // Wallet addresses
+    const TACC_WALLET = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+    const TACC_CONTRACT = "0xb021a0e505ecfe41dcb497b70fb123430e30d94d";
+    const USDT_WALLET = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+    const BNB_WALLET = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+    const PI_WALLET = "GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG";
+    const BSC_API_KEY = "Your-BSCscan-API-Key"; // replace with your API key
+
+    // Auth redirect
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "admin.html";
@@ -118,40 +142,31 @@
     });
 
     window.logout = function() {
-      signOut(auth).then(() => {
-        window.location.href = "admin.html";
-      });
+      signOut(auth).then(() => window.location.href = "admin.html");
     }
 
-    // -----------------------------
-    // Wallet Balances
-    // -----------------------------
-    const TACC_WALLET = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const TACC_CONTRACT = "0xb021a0e505ecfe41dcb497b70fb123430e30d94d";
-    const USDT_WALLET = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const BNB_WALLET = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
-    const PI_WALLET = "GCGZWT7FKT6TXCEOB5NLW3FWKDA4KNBNFFFCQC3UWDBDOPSOCFCPKPUG";
-
-    const BSC_API_KEY = "Your-BSCscan-API-Key"; // replace with your BSCscan API key
-
+    // Fetch balances
     async function getBscBalance(address, token = "BNB") {
       let url;
       if(token === "BNB") {
         url = `https://api.bscscan.com/api?module=account&action=balance&address=${address}&apikey=${BSC_API_KEY}`;
       } else if(token === "USDT") {
-        const contract = "0x55d398326f99059fF775485246999027B3197955"; 
+        const contract = "0x55d398326f99059fF775485246999027B3197955";
         url = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${contract}&address=${address}&tag=latest&apikey=${BSC_API_KEY}`;
       } else if(token === "TACC") {
         url = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${TACC_CONTRACT}&address=${address}&tag=latest&apikey=${BSC_API_KEY}`;
       }
       const res = await fetch(url);
       const data = await res.json();
-      return (parseInt(data.result) / 1e18).toFixed(4);
+      return data.result ? (Number(data.result) / 1e18).toFixed(4) : 0;
     }
 
+    // Pi Network balance via Firebase (temporary live)
     async function getPiBalance(address) {
-      // Placeholder: replace with Pi API call if available
-      return 0;
+      const docRef = doc(db, "pi_balances", address);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) return docSnap.data().balance;
+      return 0; // default if no data
     }
 
     async function fetchBalances() {
@@ -174,5 +189,6 @@
       }
     }
   </script>
+
 </body>
 </html>
