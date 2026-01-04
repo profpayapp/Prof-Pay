@@ -176,5 +176,32 @@
   <input id="tv-amount" type="number" placeholder="Amount">
   <button id="buy-tv">Subscribe TV</button>
 </section>
+    <script type="module">
+  import { logTransaction } from './firebase-logging.js';
+
+  window.addEventListener("DOMContentLoaded", () => {
+
+    document.getElementById("buy-airtime").addEventListener("click", () => {
+      logTransaction("admin@profpay.com", "Airtime", 1, "TACC", "success");
+      alert("Airtime transaction logged");
+    });
+
+    document.getElementById("buy-data").addEventListener("click", () => {
+      logTransaction("admin@profpay.com", "Data", 1, "TACC", "success");
+      alert("Data transaction logged");
+    });
+
+    document.getElementById("buy-electricity").addEventListener("click", () => {
+      logTransaction("admin@profpay.com", "Electricity", 1, "TACC", "success");
+      alert("Electricity transaction logged");
+    });
+
+    document.getElementById("buy-tv").addEventListener("click", () => {
+      logTransaction("admin@profpay.com", "TV Subscription", 1, "TACC", "success");
+      alert("TV transaction logged");
+    });
+
+  });
+</script>
   </script></body>
 </html>
