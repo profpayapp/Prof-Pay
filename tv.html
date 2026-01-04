@@ -1,3 +1,11 @@
-const service = "TV Subscription";
-const amount = 1500;
-const payment_method = "Pi";
+<script type="module">
+  import { logTransaction } from './firebase-logging.js';
+
+  const user_email = "admin@profpay.com";
+  const service = "TV Subscription";
+  const amount = 1500;
+  const payment_method = "Pi";
+  const status = "success";
+
+  logTransaction(user_email, service, amount, payment_method, status);
+</script>
