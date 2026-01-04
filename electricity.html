@@ -1,3 +1,11 @@
-const service = "Electricity";
-const amount = 2000;
-const payment_method = "BNB";
+<script type="module">
+  import { logTransaction } from './firebase-logging.js';
+
+  const user_email = "admin@profpay.com";
+  const service = "Electricity";
+  const amount = 2000;
+  const payment_method = "BNB";
+  const status = "success";
+
+  logTransaction(user_email, service, amount, payment_method, status);
+</script>
