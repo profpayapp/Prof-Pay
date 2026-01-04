@@ -1,111 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prof-Pay Airtime | VTpass Sandbox</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background-color: #f7f7f7;
-    }
-    .container {
-      max-width: 400px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin: auto;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-    }
-    input, select, button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 12px;
-      font-size: 16px;
-    }
-    #response {
-      margin-top: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Buy Airtime (VTpass Sandbox)</h2>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <input type="text" id="airtime-phone" placeholder="Enter Phone Number" />
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAV4OESYVvV4uLYD2wxGY2fnxLYJoOzkC0",
+    authDomain: "prof-prof.firebaseapp.com",
+    projectId: "prof-prof",
+    storageBucket: "prof-prof.appspot.com",
+    messagingSenderId: "XXXX",
+    appId: "XXXX"
+  };
 
-    <input type="number" id="airtime-amount" placeholder="Amount (₦)" />
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    <select id="airtime-network">
-      <option value="mtn">MTN</option>
-      <option value="glo">GLO</option>
-      <option value="airtel">AIRTEL</option>
-      <option value="9mobile">9MOBILE</option>
-    </select>
-
-    <button onclick="buyAirtime()">Send Airtime</button>
-
-    <div id="response"></div>
-  </div>
-
-  <script>
-    function generateRequestID() {
-      return "profpay_airtime_" + Date.now();
-    }
-
-    function buyAirtime() {
-      const phone = document.getElementById("airtime-phone").value.trim();
-      const amount = document.getElementById("airtime-amount").value.trim();
-      const network = document.getElementById("airtime-network").value;
-      const requestId = generateRequestID();
-      const responseDiv = document.getElementById("response");
-
-      if (!phone || !amount || !network) {
-        responseDiv.innerHTML = "❌ Please fill all fields.";
-        return;
-      }
-
-      const payload = {
-        request_id: requestId,
-        serviceID: "airtime",
-        billersCode: phone,
-        variation_code: network,
+  // Function to log transaction
+  export async function logTransaction(user_email, service, amount, payment_method, status) {
+    try {
+      const docRef = await addDoc(collection(db, "transactions"), {
+        user_email: user_email,
+        service: service,
         amount: amount,
-        phone: phone
-      };
-
-      responseDiv.innerHTML = "⏳ Processing airtime request...";
-
-      fetch("https://sandbox.vtpass.com/api/pay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "api-key": "sandbox",
-          "public-key": "sandbox@vtpass.com",
-          "secret-key": "sandbox"
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log("VTpass Response:", data);
-        if (data.code === "000") {
-          responseDiv.innerHTML = `✅ Success! Airtime sent to ${phone}`;
-        } else {
-          responseDiv.innerHTML = `❌ Failed: ${data.response_description}`;
-        }
-      })
-      .catch(err => {
-        console.error("Airtime Error:", err);
-        responseDiv.innerHTML = "❌ Connection error to VTpass.";
+        payment_method: payment_method,
+        status: status,
+        date: serverTimestamp()
       });
+      console.log("Transaction logged with ID:", docRef.id);
+    } catch (e) {
+      console.error("Error logging transaction:", e);
     }
-  </script>
-</body>
-</html>
+  }
+</script>
