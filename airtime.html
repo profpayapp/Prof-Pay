@@ -1,35 +1,13 @@
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { logTransaction } from './firebase-logging.js';
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAV4OESYVvV4uLYD2wxGY2fnxLYJoOzkC0",
-    authDomain: "prof-prof.firebaseapp.com",
-    projectId: "prof-prof",
-    storageBucket: "prof-prof.appspot.com",
-    messagingSenderId: "XXXX",
-    appId: "XXXX"
-  };
+  // Replace with real dynamic user info later
+  const user_email = "admin@profpay.com";
+  const service = "Airtime";
+  const amount = 500; // dynamically from input or VTpass
+  const payment_method = "TACC"; // TACC / USDT / BNB / Pi
+  const status = "success"; // success / failed
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Function to log transaction
-  export async function logTransaction(user_email, service, amount, payment_method, status) {
-    try {
-      const docRef = await addDoc(collection(db, "transactions"), {
-        user_email: user_email,
-        service: service,
-        amount: amount,
-        payment_method: payment_method,
-        status: status,
-        date: serverTimestamp()
-      });
-      console.log("Transaction logged with ID:", docRef.id);
-    } catch (e) {
-      console.error("Error logging transaction:", e);
-    }
-  }
+  // Log transaction after payment confirmation
+  logTransaction(user_email, service, amount, payment_method, status);
 </script>
