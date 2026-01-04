@@ -9,3 +9,12 @@
 
   logTransaction(user_email, service, amount, payment_method, status);
 </script>
+<script type="module">
+  import { logTransaction } from './firebase-logging.js';
+
+  // Example for the page
+  document.getElementById("buy-button").onclick = () => {
+    logTransaction("admin@profpay.com", "SERVICE_NAME", AMOUNT, "PAYMENT_METHOD", "success");
+    alert("Transaction logged to Firestore!");
+  };
+</script>
