@@ -11,3 +11,12 @@
   // Log transaction after payment confirmation
   logTransaction(user_email, service, amount, payment_method, status);
 </script>
+<button id="test-log">Test Firestore Log</button>
+<script type="module">
+  import { logTransaction } from './firebase-logging.js';
+
+  document.getElementById("test-log").onclick = () => {
+    logTransaction("admin@profpay.com", "Test Service", 1, "TACC", "success");
+    alert("Test transaction sent to Firestore!");
+  };
+</script>
