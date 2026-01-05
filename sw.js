@@ -1,55 +1,57 @@
-const CACHE_NAME = 'profpay-cache-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/utility.html',
-  '/manifest.json',
-  '/sw.js',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap'
+// sw.js - Prof-Pay Service Worker
+
+const CACHE_NAME = "prof-pay-cache-v1";
+const urlsToCache = [
+  "/",                     // index.html
+  "/index.html",
+  "/utility.html",
+  "/manifest.json",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"
 ];
 
-// Install event - cache all files
-self.addEventListener('install', event => {
-  console.log('[Service Worker] Installing...');
+// Install event - cache all assets
+self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('[Service Worker] Caching all assets');
-        return cache.addAll(ASSETS_TO_CACHE);
+        console.log("Opened cache:", CACHE_NAME);
+        return cache.addAll(urlsToCache);
       })
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 // Activate event - clean old caches
-self.addEventListener('activate', event => {
-  console.log('[Service Worker] Activating...');
+self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
+        cacheNames.map(name => {
+          if (name !== CACHE_NAME) {
+            console.log("Deleting old cache:", name);
+            return caches.delete(name);
+          }
+        })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch event - serve cached content if offline
-self.addEventListener('fetch', event => {
+// Fetch event - serve from cache if available, else fetch from network
+self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request)
-      .then(cachedRes => {
-        if (cachedRes) {
-          return cachedRes;
+      .then(response => {
+        if (response) {
+          return response; // return cached asset
         }
-        return fetch(event.request)
+        return fetch(event.request) // fetch from network if not cached
           .catch(() => {
-            // fallback page if needed
-            if (event.request.destination === 'document') {
-              return caches.match('/index.html');
+            // Optional: fallback for offline page or image
+            if (event.request.destination === "document") {
+              return caches.match("/index.html");
             }
           });
       })
