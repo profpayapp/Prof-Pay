@@ -1,11 +1,11 @@
 {
   "name": "Prof-Pay",
   "short_name": "Prof-Pay",
-  "start_url": "/Prof-Pay/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#004080",
   "theme_color": "#004080",
-  "orientation": "portrait",
+  "description": "Prof-Pay: Your One-Stop Utility & Payment Platform",
   "icons": [
     {
       "src": "icons/icon-192.png",
