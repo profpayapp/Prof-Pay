@@ -1,106 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prof-Pay Utility Services</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    padding: 2rem;
+    text-align: center;
+  }
+  h1 {
+    color: #004080;
+    margin-bottom: 1.5rem;
+  }
+  section {
+    background: white;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+  input {
+    padding: 0.5rem;
+    width: 120px;
+    margin-right: 1rem;
+  }
+  button {
+    padding: 0.6rem 1.2rem;
+    background: #004080;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Prof-Pay Utility Services</h1>
+
+<section id="airtime">
+  <h2>Airtime</h2>
+  <input id="airtime-amount" type="number" placeholder="Amount">
+  <button id="buy-airtime">Buy Airtime</button>
+</section>
+
+<section id="data">
+  <h2>Data</h2>
+  <input id="data-amount" type="number" placeholder="Amount">
+  <button id="buy-data">Buy Data</button>
+</section>
+
+<section id="electricity">
+  <h2>Electricity</h2>
+  <input id="electricity-amount" type="number" placeholder="Amount">
+  <button id="buy-electricity">Pay Electricity</button>
+</section>
+
+<section id="tv">
+  <h2>TV Subscription</h2>
+  <input id="tv-amount" type="number" placeholder="Amount">
+  <button id="buy-tv">Subscribe TV</button>
+</section>
+
 <script type="module">
 import { logTransaction } from './firebase-logging.js';
 
-/* ---------- Offline Storage ---------- */
-function saveOfflineTransaction(transaction) {
-  const request = indexedDB.open('profpay-db', 1);
-  request.onupgradeneeded = e => {
-    const db = e.target.result;
-    if (!db.objectStoreNames.contains('transactions')) {
-      db.createObjectStore('transactions', { autoIncrement: true });
-    }
-  };
-  request.onsuccess = e => {
-    const db = e.target.result;
-    const tx = db.transaction('transactions', 'readwrite');
-    tx.objectStore('transactions').add(transaction);
-  };
-}
+function handlePayment(service, amount) {
+  if (!amount || amount <= 0) {
+    alert("Please enter a valid amount");
+    return;
+  }
 
-function getOfflineTransactions(callback) {
-  const request = indexedDB.open('profpay-db', 1);
-  request.onsuccess = e => {
-    const db = e.target.result;
-    const tx = db.transaction('transactions', 'readonly');
-    const store = tx.objectStore('transactions');
-    const getAll = store.getAll();
-    getAll.onsuccess = () => callback(getAll.result || []);
-  };
-}
-
-/* ---------- UI Helper ---------- */
-function handleButton(button, action) {
-  button.disabled = true;
-  const originalText = button.innerText;
-  button.innerText = "Processing...";
-
-  setTimeout(() => {
-    action();
-    button.disabled = false;
-    button.innerText = originalText;
-  }, 800);
-}
-
-/* ---------- Transaction Processor ---------- */
-function processTransaction(service, amount) {
-  const transaction = {
-    user_email: 'admin@profpay.com',
+  logTransaction(
+    "admin@profpay.com",
     service,
     amount,
-    payment_method: 'TACC',
-    status: 'success',
-    date: new Date().toISOString()
-  };
+    "TACC",
+    "success"
+  );
 
-  if (navigator.onLine) {
-    logTransaction(
-      transaction.user_email,
-      transaction.service,
-      transaction.amount,
-      transaction.payment_method,
-      transaction.status
-    );
-    alert(`✅ ${service} of ${amount} logged successfully`);
-  } else {
-    saveOfflineTransaction(transaction);
-    alert(`⚠️ Offline: ${service} saved and will sync automatically`);
-  }
+  alert(service + " payment of " + amount + " logged successfully!");
 }
 
-/* ---------- Button Events ---------- */
-document.getElementById("buy-airtime").onclick = e => {
-  const amount = Number(document.getElementById("airtime-amount").value) || 1;
-  handleButton(e.target, () => processTransaction("Airtime", amount));
+document.getElementById("buy-airtime").onclick = () => {
+  handlePayment("Airtime", document.getElementById("airtime-amount").value);
 };
 
-document.getElementById("buy-data").onclick = e => {
-  const amount = Number(document.getElementById("data-amount").value) || 1;
-  handleButton(e.target, () => processTransaction("Data", amount));
+document.getElementById("buy-data").onclick = () => {
+  handlePayment("Data", document.getElementById("data-amount").value);
 };
 
-document.getElementById("buy-electricity").onclick = e => {
-  const amount = Number(document.getElementById("electricity-amount").value) || 1;
-  handleButton(e.target, () => processTransaction("Electricity", amount));
+document.getElementById("buy-electricity").onclick = () => {
+  handlePayment("Electricity", document.getElementById("electricity-amount").value);
 };
 
-document.getElementById("buy-tv").onclick = e => {
-  const amount = Number(document.getElementById("tv-amount").value) || 1;
-  handleButton(e.target, () => processTransaction("TV Subscription", amount));
+document.getElementById("buy-tv").onclick = () => {
+  handlePayment("TV Subscription", document.getElementById("tv-amount").value);
 };
-
-/* ---------- Auto Sync When Back Online ---------- */
-window.addEventListener('online', () => {
-  getOfflineTransactions(transactions => {
-    transactions.forEach(tx => {
-      logTransaction(tx.user_email, tx.service, tx.amount, tx.payment_method, tx.status);
-    });
-
-    const request = indexedDB.open('profpay-db', 1);
-    request.onsuccess = e => {
-      const db = e.target.result;
-      const tx = db.transaction('transactions', 'readwrite');
-      tx.objectStore('transactions').clear();
-    };
-  });
-});
 </script>
+
+</body>
+</html>
