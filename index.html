@@ -3,55 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prof-Pay | Welcome</title>
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#004080">
-  <title>Prof-Pay | Welcome</title>
+
+  <!-- Fonts & Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-    body {
-      background: #f5f7fa;
-      color: #333;
-      text-align: center;
-      padding: 2rem;
-    }
-    header {
-      margin-bottom: 2rem;
-    }
-    header h1 {
-      font-size: 2.5rem;
-      color: #2c3e50;
-    }
-    header p {
-      font-size: 1rem;
-      color: #7f8c8d;
-    }
-    .services {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-      transition: 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
-    .card a {
-      text-decoration: none;
-      color: #3498db;
-      font-weight: bold;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+    body { background:#f5f7fa; color:#333; text-align:center; padding:2rem; }
+    header { margin-bottom:2rem; }
+    header h1 { font-size:2.5rem; color:#2c3e50; }
+    header p { font-size:1rem; color:#7f8c8d; }
+    .services { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1.5rem; margin-top:3rem; }
+    .card { background:white; padding:2rem; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1); transition:0.3s ease; }
+    .card:hover { transform:translateY(-5px); }
+    .card a { text-decoration:none; color:#3498db; font-weight:bold; }
+    .quick-buttons { margin-top:3rem; display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; }
+    .quick-buttons button { padding:0.8rem 1.2rem; border:none; border-radius:8px; background:#004080; color:white; font-weight:bold; cursor:pointer; transition:0.2s ease; }
+    .quick-buttons button:hover { background:#0066cc; }
   </style>
 </head>
 <body>
@@ -60,6 +32,7 @@
     <p>Your One-Stop Utility & Payment Platform</p>
   </header>
 
+  <!-- Service Cards -->
   <section class="services">
     <div class="card">
       <h2>Airtime</h2>
@@ -78,5 +51,24 @@
       <a href="utility.html#tv">Subscribe Now →</a>
     </div>
   </section>
+
+  <!-- Quick Access Buttons -->
+  <div class="quick-buttons">
+    <button onclick="location.href='utility.html#airtime'">Buy Airtime</button>
+    <button onclick="location.href='utility.html#data'">Buy Data</button>
+    <button onclick="location.href='utility.html#electricity'">Pay Electricity</button>
+    <button onclick="location.href='utility.html#tv'">Subscribe TV</button>
+  </div>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered', reg))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
