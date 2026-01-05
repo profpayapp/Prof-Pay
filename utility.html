@@ -1,136 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prof-Pay Utility Services</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
-<style>
-  body { font-family: 'Poppins', sans-serif; background:#f5f7fa; color:#333; padding:2rem; text-align:center;}
-  h1 { color:#004080; margin-bottom:1rem;}
-  section { background:white; padding:1.5rem; margin-bottom:1.5rem; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1);}
-  input { padding:0.5rem; width:80px; margin-right:1rem;}
-  button { padding:0.5rem 1rem; background:#004080; color:white; border:none; border-radius:5px; cursor:pointer;}
-</style>
-</head>
-<body>
-<h1>Prof-Pay Utility Services</h1>
-
-<!-- Airtime -->
-<section id="airtime">
-  <h2>Airtime</h2>
-  <input id="airtime-amount" type="number" placeholder="Amount">
-  <button id="buy-airtime">Buy Airtime</button>
-</section>
-
-<!-- Data -->
-<section id="data">
-  <h2>Data</h2>
-  <input id="data-amount" type="number" placeholder="Amount">
-  <button id="buy-data">Buy Data</button>
-</section>
-
-<!-- Electricity -->
-<section id="electricity">
-  <h2>Electricity</h2>
-  <input id="electricity-amount" type="number" placeholder="Amount">
-  <button id="buy-electricity">Pay Electricity</button>
-</section>
-
-<!-- TV Subscription -->
-<section id="tv">
-  <h2>TV Subscription</h2>
-  <input id="tv-amount" type="number" placeholder="Amount">
-  <button id="buy-tv">Subscribe TV</button>
-</section>
-
 <script type="module">
 import { logTransaction } from './firebase-logging.js';
 
-// Offline storage using IndexedDB
+/* ---------- Offline Storage ---------- */
 function saveOfflineTransaction(transaction) {
-  const request = indexedDB.open('profpay-db',1);
-  request.onupgradeneeded = e => { 
+  const request = indexedDB.open('profpay-db', 1);
+  request.onupgradeneeded = e => {
     const db = e.target.result;
-    if(!db.objectStoreNames.contains('transactions')) db.createObjectStore('transactions',{autoIncrement:true});
+    if (!db.objectStoreNames.contains('transactions')) {
+      db.createObjectStore('transactions', { autoIncrement: true });
+    }
   };
   request.onsuccess = e => {
     const db = e.target.result;
-    const tx = db.transaction('transactions','readwrite');
-    const store = tx.objectStore('transactions');
-    store.add(transaction);
-    console.log('Transaction saved offline:', transaction);
+    const tx = db.transaction('transactions', 'readwrite');
+    tx.objectStore('transactions').add(transaction);
   };
-  request.onerror = e => console.error('IndexedDB error:', e.target.error);
 }
 
-function getOfflineTransactions(callback){
-  const request = indexedDB.open('profpay-db',1);
-  request.onsuccess = e=>{
+function getOfflineTransactions(callback) {
+  const request = indexedDB.open('profpay-db', 1);
+  request.onsuccess = e => {
     const db = e.target.result;
-    const tx = db.transaction('transactions','readonly');
+    const tx = db.transaction('transactions', 'readonly');
     const store = tx.objectStore('transactions');
     const getAll = store.getAll();
-    getAll.onsuccess = ()=>callback(getAll.result);
-    getAll.onerror = e=>{console.error(e.target.error); callback([]);}
+    getAll.onsuccess = () => callback(getAll.result || []);
   };
 }
 
-// Main transaction processor
-function processTransaction(service, amount, paymentMethod){
+/* ---------- UI Helper ---------- */
+function handleButton(button, action) {
+  button.disabled = true;
+  const originalText = button.innerText;
+  button.innerText = "Processing...";
+
+  setTimeout(() => {
+    action();
+    button.disabled = false;
+    button.innerText = originalText;
+  }, 800);
+}
+
+/* ---------- Transaction Processor ---------- */
+function processTransaction(service, amount) {
   const transaction = {
-    user_email:'admin@profpay.com',
-    service:service,
-    amount:amount,
-    payment_method:paymentMethod,
-    status:'success',
-    date:new Date().toISOString()
+    user_email: 'admin@profpay.com',
+    service,
+    amount,
+    payment_method: 'TACC',
+    status: 'success',
+    date: new Date().toISOString()
   };
-  if(navigator.onLine){
-    logTransaction(transaction.user_email,service,amount,paymentMethod,'success');
-    alert(`${service} transaction of ${amount} logged successfully!`);
+
+  if (navigator.onLine) {
+    logTransaction(
+      transaction.user_email,
+      transaction.service,
+      transaction.amount,
+      transaction.payment_method,
+      transaction.status
+    );
+    alert(`✅ ${service} of ${amount} logged successfully`);
   } else {
     saveOfflineTransaction(transaction);
-    alert(`No network! Transaction saved offline: ${service} - ${amount}`);
+    alert(`⚠️ Offline: ${service} saved and will sync automatically`);
   }
 }
 
-// Button click handlers
-document.getElementById("buy-airtime").onclick = () => {
-  const amount = parseFloat(document.getElementById("airtime-amount").value)||1;
-  processTransaction("Airtime",amount,"TACC");
-};
-document.getElementById("buy-data").onclick = () => {
-  const amount = parseFloat(document.getElementById("data-amount").value)||1;
-  processTransaction("Data",amount,"TACC");
-};
-document.getElementById("buy-electricity").onclick = () => {
-  const amount = parseFloat(document.getElementById("electricity-amount").value)||1;
-  processTransaction("Electricity",amount,"TACC");
-};
-document.getElementById("buy-tv").onclick = () => {
-  const amount = parseFloat(document.getElementById("tv-amount").value)||1;
-  processTransaction("TV Subscription",amount,"TACC");
+/* ---------- Button Events ---------- */
+document.getElementById("buy-airtime").onclick = e => {
+  const amount = Number(document.getElementById("airtime-amount").value) || 1;
+  handleButton(e.target, () => processTransaction("Airtime", amount));
 };
 
-// Sync offline transactions when back online
-window.addEventListener('online', ()=>{
-  getOfflineTransactions(transactions=>{
-    transactions.forEach(tx=>{
+document.getElementById("buy-data").onclick = e => {
+  const amount = Number(document.getElementById("data-amount").value) || 1;
+  handleButton(e.target, () => processTransaction("Data", amount));
+};
+
+document.getElementById("buy-electricity").onclick = e => {
+  const amount = Number(document.getElementById("electricity-amount").value) || 1;
+  handleButton(e.target, () => processTransaction("Electricity", amount));
+};
+
+document.getElementById("buy-tv").onclick = e => {
+  const amount = Number(document.getElementById("tv-amount").value) || 1;
+  handleButton(e.target, () => processTransaction("TV Subscription", amount));
+};
+
+/* ---------- Auto Sync When Back Online ---------- */
+window.addEventListener('online', () => {
+  getOfflineTransactions(transactions => {
+    transactions.forEach(tx => {
       logTransaction(tx.user_email, tx.service, tx.amount, tx.payment_method, tx.status);
-      console.log('Offline transaction synced:', tx);
     });
-    // Clear after sync
-    const request = indexedDB.open('profpay-db',1);
-    request.onsuccess = e=>{
+
+    const request = indexedDB.open('profpay-db', 1);
+    request.onsuccess = e => {
       const db = e.target.result;
-      const tx = db.transaction('transactions','readwrite');
-      const store = tx.objectStore('transactions');
-      store.clear();
-      console.log('Offline transactions cleared.');
+      const tx = db.transaction('transactions', 'readwrite');
+      tx.objectStore('transactions').clear();
     };
   });
 });
 </script>
-</body>
-</html>
