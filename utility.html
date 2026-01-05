@@ -6,7 +6,7 @@
 <title>Prof-Pay Utility Services</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Poppins', sans-serif; background:#f5f7fa; color:#333; padding:2rem; text-align:center;}
+  body { font-family:'Poppins',sans-serif; background:#f5f7fa; color:#333; padding:2rem; text-align:center;}
   h1 { color:#004080; margin-bottom:1rem;}
   section { background:white; padding:1.5rem; margin-bottom:1.5rem; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1);}
   input { padding:0.5rem; width:120px; margin-right:1rem;}
@@ -89,46 +89,52 @@ async function processTransaction(service, amount, billersCode){
     date:new Date().toISOString()
   };
 
-  if(navigator.onLine){
-    // Call VTpass API
-    const vtResponse = await purchaseVT(service.toLowerCase(), billersCode, amount);
-    if(vtResponse && vtResponse.response_description === "Transaction Successful"){
-      alert(`✅ ${service} transaction of ${amount} successful online!`);
-      logTransaction(transaction.user_email, service, amount, transaction.payment_method, 'success');
+  try {
+    if(navigator.onLine){
+      // Call VTpass API
+      const vtResponse = await purchaseVT(service.toLowerCase(), billersCode, amount);
+      if(vtResponse && vtResponse.response_description === "Transaction Successful"){
+        alert(`✅ ${service} transaction of ${amount} successful online!`);
+        logTransaction(transaction.user_email, service, amount, transaction.payment_method, 'success');
+      } else {
+        alert(`⚠️ ${service} transaction failed: ${vtResponse.error || vtResponse.response_description}`);
+        saveOffline(transaction);
+      }
     } else {
-      alert(`❌ ${service} transaction failed: ${vtResponse.error || vtResponse.response_description}`);
       saveOffline(transaction);
+      alert(`⚠️ No network! ${service} transaction saved offline: ${amount}`);
     }
-  } else {
+  } catch (err) {
+    console.error(err);
     saveOffline(transaction);
-    alert(`⚠️ No network! ${service} transaction saved offline: ${amount}`);
+    alert(`❌ Error occurred. Transaction saved offline.`);
   }
 }
 
 // Button click handlers
-document.getElementById("buy-airtime").onclick = async () => {
+document.getElementById("buy-airtime").addEventListener("click", async ()=>{
   const amount = parseFloat(document.getElementById("airtime-amount").value)||100;
   const phone = prompt("Enter phone number:");
   if(phone) await processTransaction("Airtime", amount, phone);
-};
+});
 
-document.getElementById("buy-data").onclick = async () => {
+document.getElementById("buy-data").addEventListener("click", async ()=>{
   const amount = parseFloat(document.getElementById("data-amount").value)||100;
   const phone = prompt("Enter phone number:");
   if(phone) await processTransaction("Data", amount, phone);
-};
+});
 
-document.getElementById("buy-electricity").onclick = async () => {
+document.getElementById("buy-electricity").addEventListener("click", async ()=>{
   const amount = parseFloat(document.getElementById("electricity-amount").value)||500;
   const meter = prompt("Enter meter number:");
   if(meter) await processTransaction("Electricity", amount, meter);
-};
+});
 
-document.getElementById("buy-tv").onclick = async () => {
+document.getElementById("buy-tv").addEventListener("click", async ()=>{
   const amount = parseFloat(document.getElementById("tv-amount").value)||1500;
   const smartcard = prompt("Enter smartcard number:");
   if(smartcard) await processTransaction("TV Subscription", amount, smartcard);
-};
+});
 
 // Sync offline transactions when back online
 window.addEventListener('online', ()=>{
@@ -137,7 +143,6 @@ window.addEventListener('online', ()=>{
       logTransaction(tx.user_email, tx.service, tx.amount, tx.payment_method, tx.status);
       console.log('Offline transaction synced:', tx);
     });
-    // Clear offline store
     const request = indexedDB.open('profpay-db',1);
     request.onsuccess = e=>{
       const db = e.target.result;
