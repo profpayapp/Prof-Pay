@@ -5,94 +5,206 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prof-Pay Utility Services</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
-
 <style>
-body{
-  font-family:'Poppins',sans-serif;
-  background:#f5f7fa;
-  padding:2rem;
-  text-align:center;
-}
-h1{color:#004080;}
-section{
-  background:#fff;
-  padding:1.5rem;
-  margin:1rem auto;
-  max-width:420px;
-  border-radius:12px;
-  box-shadow:0 2px 12px rgba(0,0,0,.1);
-}
-input,select{
-  padding:.6rem;
-  width:80%;
-  margin:.5rem 0;
-}
-button{
-  padding:.7rem 1.5rem;
-  background:#004080;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
+  body { font-family: 'Poppins', sans-serif; background:#f5f7fa; color:#333; padding:2rem; text-align:center;}
+  h1 { color:#004080; margin-bottom:1rem;}
+  section { background:white; padding:1.5rem; margin-bottom:1.5rem; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+  input { padding:0.5rem; width:120px; margin-right:1rem;}
+  button { padding:0.5rem 1rem; background:#004080; color:white; border:none; border-radius:5px; cursor:pointer;}
+  #wallet-balances p { font-size: 1.1rem; margin: 0.3rem 0; }
 </style>
 </head>
-
 <body>
 <h1>Prof-Pay Utility Services</h1>
-<p>Pay with TACC • USDT • BNB • <strong>Pi</strong></p>
+<p>Offline & Online transactions powered by TACC + VTpass</p>
 
-<section>
-  <h2>Select Service</h2>
-  <select id="service">
-    <option value="Airtime">Airtime</option>
-    <option value="Data">Data</option>
-    <option value="Electricity">Electricity</option>
-    <option value="TV Subscription">TV Subscription</option>
-  </select>
+<!-- Wallet Balances -->
+<section id="wallet-balances">
+  <h2>Wallet Balances</h2>
+  <p>TACC: <span id="tacc-balance">0</span></p>
+  <p>USDT: <span id="usdt-balance">0</span></p>
+  <p>BNB: <span id="bnb-balance">0</span></p>
+  <p>Pi: <span id="pi-balance">0</span></p>
+</section>
 
-  <input id="amount" type="number" placeholder="Amount">
+<!-- Airtime -->
+<section id="airtime">
+  <h2>Airtime</h2>
+  <input id="airtime-amount" type="number" placeholder="Amount">
+  <button id="buy-airtime">Buy Airtime</button>
+</section>
 
-  <select id="payment">
-    <option value="TACC">TACC</option>
-    <option value="USDT">USDT</option>
-    <option value="BNB">BNB</option>
-    <option value="Pi">Pi</option>
-  </select>
+<!-- Data -->
+<section id="data">
+  <h2>Data</h2>
+  <input id="data-amount" type="number" placeholder="Amount">
+  <button id="buy-data">Buy Data</button>
+</section>
 
-  <button id="pay">Pay Now</button>
+<!-- Electricity -->
+<section id="electricity">
+  <h2>Electricity</h2>
+  <input id="electricity-amount" type="number" placeholder="Amount">
+  <button id="buy-electricity">Pay Electricity</button>
+</section>
+
+<!-- TV Subscription -->
+<section id="tv">
+  <h2>TV Subscription</h2>
+  <input id="tv-amount" type="number" placeholder="Amount">
+  <button id="buy-tv">Subscribe TV</button>
 </section>
 
 <script type="module">
-import { logTransaction } from './firebase-logging.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.min.js";
 
-document.getElementById("pay").onclick = async () => {
-  const service = document.getElementById("service").value;
-  const amount = Number(document.getElementById("amount").value || 0);
-  const payment = document.getElementById("payment").value;
+// 🔹 Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAV4OESYVvV4uLYD2wxGY2fnxLYJoOzkC0",
+  authDomain: "prof-prof.firebaseapp.com",
+  projectId: "prof-prof",
+  storageBucket: "prof-prof.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
 
-  if(amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  if(payment === "Pi"){
-    alert("🟣 Pi payment simulated successfully!");
-  } else {
-    alert(`✅ ${payment} payment successful!`);
-  }
+// Wallet address
+const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
+const provider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
 
-  await logTransaction(
-    "admin@profpay.com",
+// ERC-20 token ABI
+const tokenAbi = [
+  "function balanceOf(address) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
+
+// Token addresses
+const usdtAddress = "0x55d398326f99059fF775485246999027B3197955"; // USDT
+const taccAddress = walletAddress; // TACC
+const piAddress = "PI_CONTRACT_ADDRESS"; // Pi token
+
+// Wallet balances
+async function getBNBBalance() {
+  try {
+    const balance = await provider.getBalance(walletAddress);
+    document.getElementById("bnb-balance").innerText = parseFloat(ethers.formatEther(balance)).toFixed(4) + " BNB";
+  } catch(e){ console.error("BNB balance error", e); }
+}
+
+async function getTokenBalance(tokenAddress, elementId){
+  try{
+    const token = new ethers.Contract(tokenAddress, tokenAbi, provider);
+    const decimals = await token.decimals();
+    const balance = await token.balanceOf(walletAddress);
+    document.getElementById(elementId).innerText = (balance / (10**decimals)).toFixed(2);
+  } catch(e){ document.getElementById(elementId).innerText = "0"; }
+}
+
+getBNBBalance();
+getTokenBalance(usdtAddress, "usdt-balance");
+getTokenBalance(taccAddress, "tacc-balance");
+getTokenBalance(piAddress, "pi-balance");
+
+// IndexedDB for offline
+function saveOffline(tx){
+  const request = indexedDB.open('profpay-db',1);
+  request.onupgradeneeded = e=>{
+    const db = e.target.result;
+    if(!db.objectStoreNames.contains('transactions'))
+      db.createObjectStore('transactions',{autoIncrement:true});
+  };
+  request.onsuccess = e=>{
+    const db = e.target.result;
+    db.transaction('transactions','readwrite').objectStore('transactions').add(tx);
+    console.log("Offline transaction saved:", tx);
+  };
+}
+
+function getOffline(callback){
+  const request = indexedDB.open('profpay-db',1);
+  request.onsuccess = e=>{
+    const db = e.target.result;
+    const tx = db.transaction('transactions','readonly').objectStore('transactions').getAll();
+    tx.onsuccess = ()=>callback(tx.result);
+    tx.onerror = e=>{ console.error(e.target.error); callback([]); }
+  };
+}
+
+// Log transaction to Firestore
+async function logTransaction(user_email, service, amount, payment_method, status){
+  try{
+    await addDoc(collection(db,"transactions"),{
+      user_email, service, amount, payment_method, status, date: serverTimestamp()
+    });
+    console.log(`Transaction logged: ${service} ${amount} ${payment_method}`);
+  } catch(e){ console.error("Firestore error:", e); }
+}
+
+// Process transaction
+async function processTransaction(service, amount){
+  const transaction = {
+    user_email: "admin@profpay.com",
     service,
     amount,
-    payment,
-    "success"
-  );
+    payment_method: "TACC",
+    status: "success",
+    date: new Date().toISOString()
+  };
+  
+  if(navigator.onLine){
+    // Simulate successful transaction (replace with real API call if needed)
+    alert(`✅ ${service} of ${amount} executed online!`);
+    logTransaction(transaction.user_email, service, amount, transaction.payment_method, transaction.status);
+  } else {
+    saveOffline(transaction);
+    alert(`⚠️ ${service} of ${amount} saved offline!`);
+  }
+}
 
-  alert("Transaction logged to Firestore ✔");
+// Button handlers
+document.getElementById("buy-airtime").onclick = ()=> {
+  const amount = parseFloat(document.getElementById("airtime-amount").value) || 100;
+  const phone = prompt("Enter phone number:");
+  if(phone) processTransaction("Airtime", amount);
 };
-</script>
 
+document.getElementById("buy-data").onclick = ()=> {
+  const amount = parseFloat(document.getElementById("data-amount").value) || 100;
+  const phone = prompt("Enter phone number:");
+  if(phone) processTransaction("Data", amount);
+};
+
+document.getElementById("buy-electricity").onclick = ()=> {
+  const amount = parseFloat(document.getElementById("electricity-amount").value) || 500;
+  const meter = prompt("Enter meter number:");
+  if(meter) processTransaction("Electricity", amount);
+};
+
+document.getElementById("buy-tv").onclick = ()=> {
+  const amount = parseFloat(document.getElementById("tv-amount").value) || 1500;
+  const smartcard = prompt("Enter smartcard number:");
+  if(smartcard) processTransaction("TV Subscription", amount);
+};
+
+// Sync offline transactions
+window.addEventListener('online', ()=>{
+  getOffline(transactions=>{
+    transactions.forEach(tx=>{
+      logTransaction(tx.user_email, tx.service, tx.amount, tx.payment_method, tx.status);
+      console.log("Offline transaction synced:", tx);
+    });
+    const request = indexedDB.open('profpay-db',1);
+    request.onsuccess = e=>{
+      e.target.result.transaction('transactions','readwrite').objectStore('transactions').clear();
+      console.log("Offline transactions cleared");
+    };
+  });
+});
+</script>
 </body>
 </html>
