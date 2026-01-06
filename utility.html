@@ -6,39 +6,35 @@
 <title>Prof-Pay Utility Services</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Poppins', sans-serif; background:#f5f7fa; color:#333; padding:2rem; text-align:center;}
-  h1 { color:#004080; margin-bottom:1rem;}
-  section { background:white; padding:1.5rem; margin-bottom:1.5rem; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1);}
-  input { padding:0.5rem; width:120px; margin-right:1rem;}
-  button { padding:0.5rem 1rem; background:#004080; color:white; border:none; border-radius:5px; cursor:pointer;}
+body { font-family: 'Poppins', sans-serif; background:#f5f7fa; color:#333; padding:2rem; text-align:center;}
+h1 { color:#004080; margin-bottom:1rem;}
+section { background:white; padding:1.5rem; margin-bottom:1.5rem; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+input { padding:0.5rem; width:120px; margin-right:1rem;}
+button { padding:0.5rem 1rem; background:#004080; color:white; border:none; border-radius:5px; cursor:pointer;}
 </style>
 </head>
 <body>
 <h1>Prof-Pay Utility Services</h1>
-<p>Offline & Online transactions powered by TACC + VTpass</p>
+<p>Offline & Online transactions powered by TACC + VTpass (Sandbox)</p>
 
-<!-- Airtime -->
 <section id="airtime">
   <h2>Airtime</h2>
   <input id="airtime-amount" type="number" placeholder="Amount">
   <button id="buy-airtime">Buy Airtime</button>
 </section>
 
-<!-- Data -->
 <section id="data">
   <h2>Data</h2>
   <input id="data-amount" type="number" placeholder="Amount">
   <button id="buy-data">Buy Data</button>
 </section>
 
-<!-- Electricity -->
 <section id="electricity">
   <h2>Electricity</h2>
   <input id="electricity-amount" type="number" placeholder="Amount">
   <button id="buy-electricity">Pay Electricity</button>
 </section>
 
-<!-- TV Subscription -->
 <section id="tv">
   <h2>TV Subscription</h2>
   <input id="tv-amount" type="number" placeholder="Amount">
@@ -46,66 +42,19 @@
 </section>
 
 <script type="module">
-import { logTransaction } from './firebase-logging.js';
 import { purchaseVT } from './vtpass-api.js';
 
-// IndexedDB offline storage
-function saveOffline(transaction){
-  const request = indexedDB.open('profpay-db',1);
-  request.onupgradeneeded = e=>{
-    const db = e.target.result;
-    if(!db.objectStoreNames.contains('transactions'))
-      db.createObjectStore('transactions',{autoIncrement:true});
-  };
-  request.onsuccess = e=>{
-    const db = e.target.result;
-    const tx = db.transaction('transactions','readwrite');
-    tx.objectStore('transactions').add(transaction);
-    console.log('Offline transaction saved:', transaction);
-  };
-  request.onerror = e=>console.error('IndexedDB error:', e.target.error);
-}
-
-function getOffline(callback){
-  const request = indexedDB.open('profpay-db',1);
-  request.onsuccess = e=>{
-    const db = e.target.result;
-    const tx = db.transaction('transactions','readonly');
-    const store = tx.objectStore('transactions');
-    const getAll = store.getAll();
-    getAll.onsuccess = ()=>callback(getAll.result);
-    getAll.onerror = e=>{ console.error(e.target.error); callback([]); }
-  };
-}
-
-// Process transaction function
-async function processTransaction(service, amount, billersCode){
-  const transaction = {
-    user_email:'admin@profpay.com',
-    service,
-    amount,
-    payment_method:'TACC',
-    status:'success',
-    date:new Date().toISOString()
-  };
-
-  if(navigator.onLine){
-    // Call VTpass API
-    const vtResponse = await purchaseVT(service.toLowerCase(), billersCode, amount);
-    if(vtResponse && vtResponse.response_description === "Transaction Successful"){
-      alert(`✅ ${service} transaction of ${amount} successful online!`);
-      logTransaction(transaction.user_email, service, amount, transaction.payment_method, 'success');
-    } else {
-      alert(`❌ ${service} transaction failed: ${vtResponse.error || vtResponse.response_description}`);
-      saveOffline(transaction);
-    }
+// Function to process transaction
+async function processTransaction(service, amount, billersCode) {
+  const result = await purchaseVT(service.toLowerCase(), billersCode, amount);
+  if(result.response_description === "Transaction Successful") {
+    alert(`✅ ${service} transaction successful! Request ID: ${result.request_id}`);
   } else {
-    saveOffline(transaction);
-    alert(`⚠️ No network! ${service} transaction saved offline: ${amount}`);
+    alert(`❌ ${service} transaction failed: ${result.response_description}`);
   }
 }
 
-// Button click handlers
+// Button handlers
 document.getElementById("buy-airtime").onclick = async () => {
   const amount = parseFloat(document.getElementById("airtime-amount").value)||100;
   const phone = prompt("Enter phone number:");
@@ -129,24 +78,6 @@ document.getElementById("buy-tv").onclick = async () => {
   const smartcard = prompt("Enter smartcard number:");
   if(smartcard) await processTransaction("TV Subscription", amount, smartcard);
 };
-
-// Sync offline transactions when back online
-window.addEventListener('online', ()=>{
-  getOffline(transactions=>{
-    transactions.forEach(tx=>{
-      logTransaction(tx.user_email, tx.service, tx.amount, tx.payment_method, tx.status);
-      console.log('Offline transaction synced:', tx);
-    });
-    // Clear offline store
-    const request = indexedDB.open('profpay-db',1);
-    request.onsuccess = e=>{
-      const db = e.target.result;
-      const tx = db.transaction('transactions','readwrite');
-      tx.objectStore('transactions').clear();
-      console.log('Offline transactions cleared.');
-    };
-  });
-});
 </script>
 </body>
 </html>
