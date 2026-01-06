@@ -66,7 +66,6 @@ function saveOffline(transaction){
   request.onerror = e=>console.error('IndexedDB error:', e.target.error);
 }
 
-// Retrieve offline transactions
 function getOffline(callback){
   const request = indexedDB.open('profpay-db',1);
   request.onsuccess = e=>{
@@ -79,7 +78,7 @@ function getOffline(callback){
   };
 }
 
-// Process transaction
+// Process transaction function
 async function processTransaction(service, amount, billersCode){
   const transaction = {
     user_email:'admin@profpay.com',
@@ -91,6 +90,7 @@ async function processTransaction(service, amount, billersCode){
   };
 
   if(navigator.onLine){
+    // Call VTpass API
     const vtResponse = await purchaseVT(service.toLowerCase(), billersCode, amount);
     if(vtResponse && vtResponse.response_description === "Transaction Successful"){
       alert(`✅ ${service} transaction of ${amount} successful online!`);
@@ -130,13 +130,14 @@ document.getElementById("buy-tv").onclick = async () => {
   if(smartcard) await processTransaction("TV Subscription", amount, smartcard);
 };
 
-// Sync offline transactions when online
+// Sync offline transactions when back online
 window.addEventListener('online', ()=>{
   getOffline(transactions=>{
     transactions.forEach(tx=>{
       logTransaction(tx.user_email, tx.service, tx.amount, tx.payment_method, tx.status);
       console.log('Offline transaction synced:', tx);
     });
+    // Clear offline store
     const request = indexedDB.open('profpay-db',1);
     request.onsuccess = e=>{
       const db = e.target.result;
