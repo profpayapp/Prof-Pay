@@ -1,23 +1,33 @@
 // vtpass-api.js
-const VT_API_KEY = "6e42765736a76d61f25b1073866f2947"; // Sandbox API Key
-const VT_SECRET_KEY = "SK_613610efe312a14f39c8fe51291320048e39980c7ab"; // Sandbox Secret Key
-const VT_BASE_URL = "https://sandbox.vtpass.com/api";
+// This file handles VTpass API calls for Prof-Pay
 
-// Function to make payment via VTpass
+const VT_API_URL = "https://sandbox.vtpass.com/api"; // Sandbox URL
+const API_KEY = "6e42765736a76d61f25b1073866f2947"; // Your sandbox API Key
+const SECRET_KEY = "SK_613610efe312a14f39c8fe51291320048e39980c7ab"; // Your sandbox Secret Key
+
+/**
+ * Purchase a VTpass service
+ * @param {string} service - Service type (airtime, data, electricity, tv)
+ * @param {string} billersCode - Phone number, meter number, or smartcard number
+ * @param {number} amount - Amount to pay
+ * @returns {object} - Response from VTpass API
+ */
 export async function purchaseVT(service, billersCode, amount) {
   try {
     const payload = {
-      billersCode,
-      serviceID: service.toLowerCase(),
-      amount,
-      request_id: "PP_" + Date.now(),
-      apiKey: VT_API_KEY,
-      secretKey: VT_SECRET_KEY
+      serviceID: service,
+      billersCode: billersCode,
+      amount: amount,
+      request_id: `profpay_${Date.now()}`,
+      phone: billersCode // optional for airtime/data
     };
 
-    const response = await fetch(`${VT_BASE_URL}/pay`, {
+    const response = await fetch(`${VT_API_URL}/pay`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${btoa(API_KEY + ":" + SECRET_KEY)}`
+      },
       body: JSON.stringify(payload)
     });
 
@@ -25,7 +35,7 @@ export async function purchaseVT(service, billersCode, amount) {
     console.log("VTpass API Response:", data);
     return data;
   } catch (error) {
-    console.error("VTpass API Error:", error);
-    return { response_description: "Transaction failed", error: error.message };
+    console.error("Error calling VTpass API:", error);
+    return { response_description: "API Error", error: error.message };
   }
 }
