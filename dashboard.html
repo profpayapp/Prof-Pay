@@ -48,73 +48,91 @@
 </section>
 
 <script type="module">
-import { logTransaction } from './firebase-logging.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.min.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db } from './firebase-logging.js'; // ensure db is exported from firebase-logging.js
 
+// 🔹 Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAV4OESYVvV4uLYD2wxGY2fnxLYJoOzkC0",
+  authDomain: "prof-prof.firebaseapp.com",
+  projectId: "prof-prof",
+  storageBucket: "prof-prof.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Wallet address
 const walletAddress = "0x142B679A6b23B4720d81CE4beD9f4dAfE9803066";
 const provider = new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
 
-// BSC on-chain balances
-async function getBNBBalance() {
-  const balance = await provider.getBalance(walletAddress);
-  const formatted = ethers.formatEther(balance);
-  document.getElementById("bnb-balance").innerText = parseFloat(formatted).toFixed(4) + " BNB";
-}
-
+// ERC-20 token ABI
 const tokenAbi = [
   "function balanceOf(address) view returns (uint256)",
   "function decimals() view returns (uint8)"
 ];
 
-async function getTokenBalance(tokenAddress, elementId) {
-  const token = new ethers.Contract(tokenAddress, tokenAbi, provider);
-  const decimals = await token.decimals();
-  const balance = await token.balanceOf(walletAddress);
-  const formatted = balance / (10 ** decimals);
-  document.getElementById(elementId).innerText = formatted.toFixed(2);
+// Token addresses
+const usdtAddress = "0x55d398326f99059fF775485246999027B3197955"; // USDT on BSC
+const taccAddress = walletAddress; // Replace with TACC contract if different
+const piAddress = "PI_CONTRACT_ADDRESS"; // Replace with actual Pi token contract if available
+
+// Fetch BNB balance
+async function getBNBBalance() {
+  try {
+    const balance = await provider.getBalance(walletAddress);
+    const formatted = ethers.formatEther(balance);
+    document.getElementById("bnb-balance").innerText = parseFloat(formatted).toFixed(4) + " BNB";
+  } catch(e) {
+    console.error("BNB balance fetch error:", e);
+  }
 }
 
-// Token addresses
-const usdtAddress = "0x55d398326f99059fF775485246999027B3197955"; // USDT
-const taccAddress = walletAddress; // update if different contract
+// Fetch ERC-20 token balances
+async function getTokenBalance(tokenAddress, elementId) {
+  try {
+    const token = new ethers.Contract(tokenAddress, tokenAbi, provider);
+    const decimals = await token.decimals();
+    const balance = await token.balanceOf(walletAddress);
+    const formatted = balance / (10 ** decimals);
+    document.getElementById(elementId).innerText = formatted.toFixed(2);
+  } catch(e) {
+    console.error(`${elementId} balance fetch error:`, e);
+    document.getElementById(elementId).innerText = "0";
+  }
+}
 
+// Fetch all balances
 getBNBBalance();
 getTokenBalance(usdtAddress, "usdt-balance");
 getTokenBalance(taccAddress, "tacc-balance");
+getTokenBalance(piAddress, "pi-balance");
 
-// Firestore balances
-async function getWalletBalancesFromFirestore() {
-  const snapshot = await getDocs(collection(db, "transactions"));
-  let taccTotal = 0, usdtTotal = 0, bnbTotal = 0, piTotal = 0;
+// Load real transactions from Firestore
+async function loadTransactions() {
   const tbody = document.getElementById("transaction-body");
+  tbody.innerHTML = ""; // clear previous rows
 
-  snapshot.forEach(doc => {
-    const tx = doc.data();
-    // Sum balances per payment method
-    if(tx.status === "success") {
-      switch(tx.payment_method.toLowerCase()) {
-        case "tacc": taccTotal += tx.amount; break;
-        case "usdt": usdtTotal += tx.amount; break;
-        case "bnb": bnbTotal += tx.amount; break;
-        case "pi": piTotal += tx.amount; break;
-      }
-    }
+  try {
+    const q = query(collection(db, "transactions"), orderBy("date", "desc"));
+    const querySnapshot = await getDocs(q);
 
-    // Populate transactions table
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${tx.user_email}</td><td>${tx.service}</td><td>${tx.amount}</td><td>${tx.payment_method}</td><td>${tx.status}</td><td>${new Date(tx.date.seconds * 1000).toLocaleString()}</td>`;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById("tacc-balance").innerText = taccTotal.toFixed(2);
-  document.getElementById("usdt-balance").innerText = usdtTotal.toFixed(2);
-  document.getElementById("bnb-balance").innerText = bnbTotal.toFixed(4);
-  document.getElementById("pi-balance").innerText = piTotal.toFixed(2);
+    querySnapshot.forEach(doc => {
+      const tx = doc.data();
+      const tr = document.createElement("tr");
+      const date = tx.date?.toDate ? tx.date.toDate().toLocaleString() : tx.date;
+      tr.innerHTML = `<td>${tx.user_email}</td><td>${tx.service}</td><td>${tx.amount}</td><td>${tx.payment_method}</td><td>${tx.status}</td><td>${date}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("Error fetching transactions:", err);
+  }
 }
 
-getWalletBalancesFromFirestore();
+loadTransactions();
 
 </script>
 </body>
